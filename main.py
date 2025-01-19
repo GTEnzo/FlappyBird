@@ -1,19 +1,21 @@
 import pygame
 import sys
 
-WIDTH, HEIGHT = 400, 600
+WIDTH, HEIGHT = 500, 600
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
 
 class Bird:
     def __init__(self):
-        self.x = 50
+        self.x = 150
         self.y = 300
-        self.width = 30
-        self.height = 30
+        self.width = 44
+        self.height = 35
+        self.bird_img = pygame.image.load('bird.png').convert_alpha()
+        self.bird_img = pygame.transform.scale(self.bird_img, (self.width, self.height))
         self.gravity = 0.5
-        self.jump_strength = -10
+        self.jump_strength = -9
         self.velocity_y = 0
 
     def jump(self):
@@ -27,7 +29,7 @@ class Bird:
             self.velocity_y = 0
 
     def draw(self, screen):
-        pygame.draw.rect(screen, BLACK, (self.x, self.y, self.width, self.height))
+        screen.blit(self.bird_img, (self.x, self.y))
 
 
 if __name__ == '__main__':
