@@ -4,8 +4,17 @@ import sys
 WIDTH, HEIGHT = 500, 600
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-all_sprites = pygame.sprite.Group()
 pygame.init()
+all_sprites = pygame.sprite.Group()
+
+
+def start():
+    screen.fill((0, 100, 0))
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
+                return
+        pygame.display.flip()
 
 
 class Bird(pygame.sprite.Sprite):
@@ -26,8 +35,8 @@ class Bird(pygame.sprite.Sprite):
     def update(self):
         self.velocity_y += self.gravity
         self.y += self.velocity_y
-        if self.y > HEIGHT - 35:
-            self.y = HEIGHT - 35
+        if self.y > HEIGHT - 83:
+            self.y = HEIGHT - 83
             self.velocity_y = 0
 
     def draw(self, screen):
@@ -37,7 +46,10 @@ class Bird(pygame.sprite.Sprite):
 if __name__ == '__main__':
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Flappy Bird")
+    start()
     bird = Bird()
+    back_img = pygame.image.load('data/background.jpg')
+    back_img = pygame.transform.scale(back_img, (500, 600))
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -46,7 +58,7 @@ if __name__ == '__main__':
             if event.type == pygame.MOUSEBUTTONUP:
                 bird.jump()
         bird.update()
-        screen.fill(WHITE)
+        screen.blit(back_img, (0, 0))
         bird.draw(screen)
         pygame.display.flip()
         pygame.time.Clock().tick(60)
