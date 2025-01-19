@@ -4,12 +4,14 @@ import sys
 WIDTH, HEIGHT = 500, 600
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+SIZE = (44, 35)
 pygame.init()
 all_sprites = pygame.sprite.Group()
 
 
 def start():
-    screen.fill((0, 100, 0))
+    beginning = pygame.transform.scale(pygame.image.load('data/beginning.jpg'), (WIDTH, HEIGHT))
+    screen.blit(beginning, (0, 0))
     while True:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
@@ -19,7 +21,7 @@ def start():
 
 class Bird(pygame.sprite.Sprite):
     bird_img = pygame.image.load('data/bird.png')
-    bird_img = pygame.transform.scale(bird_img, (44, 35))
+    bird_img = pygame.transform.scale(bird_img, SIZE)
 
     def __init__(self):
         super().__init__(all_sprites)
