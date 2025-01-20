@@ -10,7 +10,7 @@ all_sprites = pygame.sprite.Group()
 
 
 def start():
-    beginning = pygame.transform.scale(pygame.image.load('data/beginning.png'), (WIDTH, HEIGHT))
+    beginning = pygame.transform.scale(pygame.image.load('data/beginning.jpg'), (WIDTH, HEIGHT))
     screen.blit(beginning, (0, 0))
     while True:
         for event in pygame.event.get():
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     pygame.display.set_caption("Flappy Bird")
     start()
     bird = Bird()
-    back_img = pygame.image.load('data/background.png')
+    back_img = pygame.image.load('data/background.jpg')
     back_img = pygame.transform.scale(back_img, (500, 600))
     while True:
         for event in pygame.event.get():
