@@ -56,8 +56,8 @@ class Bird(pygame.sprite.Sprite):
     def update(self):
         self.velocity_y += self.gravity
         self.y += self.velocity_y
-        if self.y > HEIGHT - 83:
-            self.y = HEIGHT - 83
+        if self.y > HEIGHT - 150:
+            self.y = HEIGHT - 150
             self.velocity_y = 0
 
     def draw(self, screen):
