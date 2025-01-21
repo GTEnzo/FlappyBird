@@ -12,15 +12,15 @@ all_sprites = pygame.sprite.Group()
 
 
 def start_screen():
-    fon = pygame.transform.scale(pygame.image.load('data/beginning.jpg'), (WIDTH, HEIGHT))
+    fon = pygame.transform.scale(pygame.image.load('data/beginning.png'), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
-    font = pygame.font.Font(None, 40)
-    button_surface = pygame.Surface((300, 75))
+    font = pygame.font.Font(None, 55)
+    button_surface = pygame.Surface((300, 75), pygame.SRCALPHA)
     text = font.render("Start", True, BLACK)
     text_rect = text.get_rect(
         center=(button_surface.get_width() / 2,
                 button_surface.get_height() / 2))
-    button_rect = pygame.Rect(100, 220, 300, 75)
+    button_rect = pygame.Rect(100, 350, 300, 75)  # 220 + 60 = 280
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -29,10 +29,7 @@ def start_screen():
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if button_rect.collidepoint(event.pos):
                     return
-        if button_rect.collidepoint(pygame.mouse.get_pos()):
-            pygame.draw.rect(button_surface, '#00B8D9', (1, 1, 298, 73))
-        else:
-            pygame.draw.rect(button_surface, WHITE, (1, 1, 298, 73))
+
         button_surface.blit(text, text_rect)
         screen.blit(button_surface, (button_rect.x, button_rect.y))
         pygame.display.update()
@@ -71,6 +68,7 @@ if __name__ == '__main__':
     bird = Bird()
     back_img = pygame.image.load('data/background.jpg')
     back_img = pygame.transform.scale(back_img, (500, 600))
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -78,10 +76,11 @@ if __name__ == '__main__':
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONUP:
                 bird.jump()
-            if event.type == pygame.K_SPACE or (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE):
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 bird.jump()
+
         bird.update()
         screen.blit(back_img, (0, 0))
         bird.draw(screen)
         pygame.display.flip()
-        pygame.time.Clock().tick(60)
+        pygame.time.Clock().tick(FPS)
