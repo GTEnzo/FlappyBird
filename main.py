@@ -20,7 +20,7 @@ def start_screen():
     text_rect = text.get_rect(
         center=(button_surface.get_width() / 2,
                 button_surface.get_height() / 2))
-    button_rect = pygame.Rect(100, 350, 300, 75)  # 220 + 60 = 280
+    button_rect = pygame.Rect(100, 350, 300, 75)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -36,9 +36,6 @@ def start_screen():
 
 
 class Bird(pygame.sprite.Sprite):
-    bird_img = pygame.image.load('data/bird.png')
-    bird_img = pygame.transform.scale(bird_img, SIZE)
-
     def __init__(self):
         super().__init__(all_sprites)
         self.x = 150
@@ -46,6 +43,12 @@ class Bird(pygame.sprite.Sprite):
         self.gravity = 0.5
         self.jump_strength = -9
         self.velocity_y = 0
+        self.images = [pygame.transform.scale(pygame.image.load(f'data/bird{i}.png'), SIZE) for i in range(1, 4)]
+        self.shot_image = 0
+        self.image = self.images[self.shot_image]
+        self.rect = self.image.get_rect(topleft=(self.x, self.y))
+        self.speed = 5
+        self.time = 0
 
     def jump(self):
         self.velocity_y = self.jump_strength
@@ -53,12 +56,21 @@ class Bird(pygame.sprite.Sprite):
     def update(self):
         self.velocity_y += self.gravity
         self.y += self.velocity_y
+        self.rect.y = self.y
+
         if self.y > HEIGHT - 150:
             self.y = HEIGHT - 150
             self.velocity_y = 0
+            self.rect.y = self.y
+
+        self.time += 1
+        if self.time >= self.speed:
+            self.time = 0
+            self.shot_image = (self.shot_image + 1) % len(self.images)
+            self.image = self.images[self.shot_image]
 
     def draw(self, screen):
-        screen.blit(self.bird_img, (self.x, self.y))
+        screen.blit(self.image, self.rect)
 
 
 if __name__ == '__main__':
