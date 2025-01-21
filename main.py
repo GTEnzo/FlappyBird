@@ -15,12 +15,12 @@ def start_screen():
     fon = pygame.transform.scale(pygame.image.load('data/beginning.jpg'), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 40)
-    button_surface = pygame.Surface((200, 50))
+    button_surface = pygame.Surface((300, 75))
     text = font.render("Start", True, BLACK)
     text_rect = text.get_rect(
         center=(button_surface.get_width() / 2,
                 button_surface.get_height() / 2))
-    button_rect = pygame.Rect(150, 350, 200, 50)
+    button_rect = pygame.Rect(100, 220, 300, 75)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -30,9 +30,9 @@ def start_screen():
                 if button_rect.collidepoint(event.pos):
                     return
         if button_rect.collidepoint(pygame.mouse.get_pos()):
-            pygame.draw.rect(button_surface, '#00B8D9', (1, 1, 198, 48))
+            pygame.draw.rect(button_surface, '#00B8D9', (1, 1, 298, 73))
         else:
-            pygame.draw.rect(button_surface, WHITE, (1, 1, 198, 48))
+            pygame.draw.rect(button_surface, WHITE, (1, 1, 298, 73))
         button_surface.blit(text, text_rect)
         screen.blit(button_surface, (button_rect.x, button_rect.y))
         pygame.display.update()
