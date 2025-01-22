@@ -25,6 +25,13 @@ def start_screen():
                 start_button.get_height() / 2))
     start_button_rect = pygame.Rect(100, 220, 300, 75)
 
+    leaders_button = pygame.Surface((300, 75))
+    leaders_text = font.render('Leaders', True, BLACK)
+    leaders_text_rect = leaders_text.get_rect(
+        center=(leaders_button.get_width() / 2,
+                leaders_button.get_height() / 2))
+    leaders = pygame.Rect(100, 320, 300, 75)
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -33,13 +40,60 @@ def start_screen():
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if start_button_rect.collidepoint(event.pos):
                     return
+                if leaders.collidepoint(event.pos):
+                    leaders_window()
+
         if start_button_rect.collidepoint(pygame.mouse.get_pos()):
             pygame.draw.rect(start_button, (141, 199, 63), (1, 1, 298, 73))
         else:
             pygame.draw.rect(start_button, (255, 251, 214), (1, 1, 298, 73))
         start_button.blit(text, text_rect)
         screen.blit(start_button, (start_button_rect.x, start_button_rect.y))
+
+        if leaders.collidepoint(pygame.mouse.get_pos()):
+            pygame.draw.rect(leaders_button, (141, 199, 63), (1, 1, 298, 73))
+        else:
+            pygame.draw.rect(leaders_button, (255, 251, 214), (1, 1, 298, 73))
+        leaders_button.blit(leaders_text, leaders_text_rect)
+        screen.blit(leaders_button, (leaders.x, leaders.y))
+
         pygame.display.update()
+
+
+def leaders_window():
+    window = pygame.display.set_mode((500, 600))
+    pygame.display.set_caption("Leaders")
+    window.fill((0, 122, 116))
+
+    font = pygame.font.Font(None, 40)
+    back_button = pygame.Surface((152, 50))
+    back_text = font.render('Back', True, BLACK)
+    back_text_rect = back_text.get_rect(center=(back_button.get_width() / 2, back_button.get_height() / 2))
+    back_button_rect = pygame.Rect(5, 5, 152, 50)
+
+    waiting = True
+    while waiting:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if back_button_rect.collidepoint(event.pos):
+                    waiting = False
+
+        if back_button_rect.collidepoint(pygame.mouse.get_pos()):
+            pygame.draw.rect(back_button, (141, 199, 63), (1, 1, 150, 48))
+        else:
+            pygame.draw.rect(back_button, (255, 251, 214), (1, 1, 150, 48))
+        back_button.blit(back_text, back_text_rect)
+        window.blit(back_button, (back_button_rect.x, back_button_rect.y))
+
+        pygame.display.flip()
+
+    pygame.display.set_mode((WIDTH, HEIGHT))
+    screen.fill((0, 122, 116))
+    logo = pygame.transform.scale(pygame.image.load('data/logo.png'), (360, 90))
+    screen.blit(logo, (70, 70))
 
 
 class Bird(pygame.sprite.Sprite):
