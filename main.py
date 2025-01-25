@@ -123,7 +123,7 @@ class Bird(pygame.sprite.Sprite):
         super().__init__(all_sprites)
         self.x = 150
         self.y = 300
-        self.gravity = 0.5
+        self.gravity = 0.55
         self.jump_strength = -9
         self.velocity = 0
         self.images = [pygame.transform.scale(load_image(f'bird{i}.png'), BIRD_SIZE) for i in range(1, 4)]
@@ -151,6 +151,15 @@ class Bird(pygame.sprite.Sprite):
             self.time = 0
             self.shot_image = (self.shot_image + 1) % len(self.images)
             self.image = self.images[self.shot_image]
+
+        if self.velocity < 0:
+            self.image = pygame.transform.rotate(self.images[self.shot_image], min(25, max(0, -self.velocity * 4)))
+        elif self.velocity > 0:
+            self.image = pygame.transform.rotate(self.images[self.shot_image], max(-70, min(0, self.velocity * -8)))
+        else:
+            self.image = self.images[self.shot_image]
+
+        self.rect = self.image.get_rect(center=self.rect.center)
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
