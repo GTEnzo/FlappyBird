@@ -1,5 +1,6 @@
 import pygame
 import sys
+import os
 
 FPS = 60
 WIDTH, HEIGHT = 500, 600
@@ -8,13 +9,32 @@ BIRD_SIZE = (44, 35)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 pygame.init()
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Flappy Bird")
 clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
 
 
+def load_image(name, colorkey=None):
+    fullname = os.path.join('data', name)
+    if not os.path.isfile(fullname):
+        print(f"Файл с изображением '{fullname}' не найден")
+        sys.exit()
+    image = pygame.image.load(fullname)
+    if colorkey is not None:
+        image = image.convert()
+        if colorkey == -1:
+            colorkey = image.get_at((0, 0))
+        image.set_colorkey(colorkey)
+    else:
+        image = image.convert_alpha()
+    return image
+
+
 def start_screen():
+    image = load_image('logo.png')
     screen.fill((0, 122, 116))
-    logo = pygame.transform.scale(pygame.image.load('data/logo.png'), (360, 90))
+    logo = pygame.transform.scale(image, (360, 90))
     screen.blit(logo, (70, 70))
 
     font = pygame.font.Font(None, 60)
@@ -91,6 +111,7 @@ def leaders_window():
         pygame.display.flip()
 
     pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption('Flappy Bird')
     screen.fill((0, 122, 116))
     logo = pygame.transform.scale(pygame.image.load('data/logo.png'), (360, 90))
     screen.blit(logo, (70, 70))
@@ -104,7 +125,7 @@ class Bird(pygame.sprite.Sprite):
         self.gravity = 0.5
         self.jump_strength = -9
         self.velocity = 0
-        self.images = [pygame.transform.scale(pygame.image.load(f'data/bird{i}.png'), BIRD_SIZE) for i in range(1, 4)]
+        self.images = [pygame.transform.scale(load_image(f'bird{i}.png'), BIRD_SIZE) for i in range(1, 4)]
         self.shot_image = 0
         self.image = self.images[self.shot_image]
         self.rect = self.image.get_rect(topleft=(self.x, self.y))
@@ -137,7 +158,7 @@ class Bird(pygame.sprite.Sprite):
 class Ground(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(all_sprites)
-        self.image = pygame.image.load('data/ground.jpg')
+        self.image = load_image('ground.jpg')
         self.speed = 2
         self.x = 0
 
@@ -153,12 +174,10 @@ class Ground(pygame.sprite.Sprite):
 
 
 if __name__ == '__main__':
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Flappy Bird")
     start_screen()
     bird = Bird()
     ground = Ground()
-    background = pygame.image.load('data/background.jpg')
+    background = load_image('background.jpg')
     background = pygame.transform.scale(background, SIZE)
 
     while True:
