@@ -134,11 +134,30 @@ class Bird(pygame.sprite.Sprite):
         screen.blit(self.image, self.rect)
 
 
+class Ground(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(all_sprites)
+        self.image = pygame.image.load('data/ground.jpg')
+        self.speed = 2
+        self.x = 0
+
+    def update(self):
+        self.x -= self.speed
+        if self.x <= -WIDTH:
+            self.x = 0
+
+    def draw(self, screen):
+        screen.blit(self.image, (self.x, 485))
+        if self.x < 0:
+            screen.blit(self.image, (self.x + 500, 485))
+
+
 if __name__ == '__main__':
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Flappy Bird")
     start_screen()
     bird = Bird()
+    ground = Ground()
     background = pygame.image.load('data/background.jpg')
     background = pygame.transform.scale(background, SIZE)
 
@@ -153,7 +172,9 @@ if __name__ == '__main__':
                 bird.jump()
 
         bird.update()
+        ground.update()
         screen.blit(background, (0, 0))
         bird.draw(screen)
+        ground.draw(screen)
         pygame.display.flip()
         pygame.time.Clock().tick(FPS)
