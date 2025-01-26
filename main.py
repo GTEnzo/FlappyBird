@@ -5,7 +5,7 @@ import os
 FPS = 60
 WIDTH, HEIGHT = 500, 600
 SIZE = (WIDTH, HEIGHT)
-BIRD_SIZE = (44, 35)
+BIRD_SIZE = (45, 35)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
@@ -23,6 +23,7 @@ def load_image(name, colorkey=None):
         print(f"Файл с изображением '{fullname}' не найден")
         sys.exit()
     image = pygame.image.load(fullname)
+
     if colorkey is not None:
         image = image.convert()
         if colorkey == -1:
@@ -35,12 +36,14 @@ def load_image(name, colorkey=None):
 
 
 def start_screen():
-    image = load_image('logo.png')
     screen.fill((0, 122, 116))
+
+    image = load_image('logo.png')
     logo = pygame.transform.scale(image, (360, 90))
     screen.blit(logo, (70, 70))
 
     font = pygame.font.Font(None, 60)
+
     start_button = pygame.Surface((300, 75))
     start_text = font.render('Start', True, BLACK)
     start_rect = start_text.get_rect(
@@ -85,10 +88,10 @@ def start_screen():
 
 def leaders_window():
     window = pygame.display.set_mode((500, 600))
-    pygame.display.set_caption('Leaders')
     window.fill((0, 122, 116))
 
     font = pygame.font.Font(None, 40)
+
     back_button = pygame.Surface((152, 50))
     back_text = font.render('Back', True, BLACK)
     back_rect = back_text.get_rect(
@@ -96,15 +99,15 @@ def leaders_window():
                 back_button.get_height() / 2))
     back_button_rect = pygame.Rect(5, 5, 152, 50)
 
-    waiting = True
-    while waiting:
+    running = True
+    while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if back_button_rect.collidepoint(event.pos):
-                    waiting = False
+                    running = False
 
         if back_button_rect.collidepoint(pygame.mouse.get_pos()):
             pygame.draw.rect(back_button, (141, 199, 63), (1, 1, 150, 48))
@@ -123,41 +126,41 @@ class Bird(pygame.sprite.Sprite):
         super().__init__(all_sprites)
         self.x = 150
         self.y = 300
-        self.gravity = 0.55
+        self.gravity = 0.6
         self.jump_strength = -9
-        self.velocity = 0
+        self.boost = 0
         self.images = [pygame.transform.scale(load_image(f'bird{i}.png'), BIRD_SIZE) for i in range(1, 4)]
-        self.shot_image = 0
-        self.image = self.images[self.shot_image]
+        self.shot = 0
+        self.image = self.images[self.shot]
         self.rect = self.image.get_rect(topleft=(self.x, self.y))
-        self.speed = 5
-        self.time = 0
+        self.shots = 5
+        self.num = 0
 
     def jump(self):
-        self.velocity = self.jump_strength
+        self.boost = self.jump_strength
 
     def update(self):
-        self.velocity += self.gravity
-        self.y += self.velocity
+        self.boost += self.gravity
+        self.y += self.boost
         self.rect.y = self.y
 
         if self.y > HEIGHT - 150:
             self.y = HEIGHT - 150
-            self.velocity = 0
+            self.boost = 0
             self.rect.y = self.y
 
-        self.time += 1
-        if self.time >= self.speed:
-            self.time = 0
-            self.shot_image = (self.shot_image + 1) % len(self.images)
-            self.image = self.images[self.shot_image]
+        self.num += 1
+        if self.num >= self.shots:
+            self.num = 0
+            self.shot = (self.shot + 1) % len(self.images)
+            self.image = self.images[self.shot]
 
-        if self.velocity < 0:
-            self.image = pygame.transform.rotate(self.images[self.shot_image], min(25, max(0, -self.velocity * 4)))
-        elif self.velocity > 0:
-            self.image = pygame.transform.rotate(self.images[self.shot_image], max(-70, min(0, self.velocity * -8)))
+        if self.boost < 0:
+            self.image = pygame.transform.rotate(self.images[self.shot], min(25, max(0, -self.boost * 4)))
+        elif self.boost > 0:
+            self.image = pygame.transform.rotate(self.images[self.shot], max(-70, min(0, self.boost * -8)))
         else:
-            self.image = self.images[self.shot_image]
+            self.image = self.images[self.shot]
 
         self.rect = self.image.get_rect(center=self.rect.center)
 
@@ -169,11 +172,11 @@ class Ground(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(all_sprites)
         self.image = load_image('ground.jpg')
-        self.speed = 2
         self.x = 0
+        self.scrolling = 2
 
     def update(self):
-        self.x -= self.speed
+        self.x -= self.scrolling
         if self.x <= -WIDTH:
             self.x = 0
 
@@ -187,8 +190,6 @@ if __name__ == '__main__':
     start_screen()
     bird = Bird()
     ground = Ground()
-    background = load_image('background.jpg')
-    background = pygame.transform.scale(background, SIZE)
 
     while True:
         for event in pygame.event.get():
@@ -202,8 +203,14 @@ if __name__ == '__main__':
 
         bird.update()
         ground.update()
+
+        image = load_image('background.jpg')
+        background = pygame.transform.scale(image, SIZE)
         screen.blit(background, (0, 0))
+
         bird.draw(screen)
         ground.draw(screen)
-        pygame.display.flip()
-        pygame.time.Clock().tick(FPS)
+
+        pygame.display.update()
+
+        clock.tick(FPS)
