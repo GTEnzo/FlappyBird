@@ -1,4 +1,5 @@
 import pygame
+import random
 import sys
 import os
 
@@ -168,10 +169,40 @@ class Bird(pygame.sprite.Sprite):
         screen.blit(self.image, self.rect)
 
 
+class Pipes(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(all_sprites)
+        self.image1 = load_image('pipe1.png')
+        self.image2 = load_image('pipe2.png')
+        self.x1 = 700
+        self.x2 = 950
+        self.scrolling = 2
+
+    def update(self):
+        self.x1 -= self.scrolling
+        self.x2 -= self.scrolling
+        if self.x1 <= -WIDTH:
+            self.x1 = 0
+        if self.x2 <= -WIDTH:
+            self.x2 = 0
+
+    def draw(self, screen):
+        screen.blit(self.image1, (self.x1, 385))
+        screen.blit(self.image2, (self.x1, -585))
+        screen.blit(self.image1, (self.x2, 385))
+        screen.blit(self.image2, (self.x2, -585))
+        if self.x1 < 0:
+            screen.blit(self.image1, (self.x1 + 500, 385))
+            screen.blit(self.image2, (self.x1 + 500, -585))
+        if self.x2 < 0:
+            screen.blit(self.image1, (self.x2 + 500, 385))
+            screen.blit(self.image2, (self.x2 + 500, -585))
+
+
 class Ground(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(all_sprites)
-        self.image = load_image('ground.jpg')
+        self.image = load_image('ground.png')
         self.x = 0
         self.scrolling = 2
 
@@ -189,6 +220,7 @@ class Ground(pygame.sprite.Sprite):
 if __name__ == '__main__':
     start_screen()
     bird = Bird()
+    pipes = Pipes()
     ground = Ground()
 
     while True:
@@ -202,6 +234,7 @@ if __name__ == '__main__':
                 bird.jump()
 
         bird.update()
+        pipes.update()
         ground.update()
 
         image = load_image('background.jpg')
@@ -209,6 +242,7 @@ if __name__ == '__main__':
         screen.blit(background, (0, 0))
 
         bird.draw(screen)
+        pipes.draw(screen)
         ground.draw(screen)
 
         pygame.display.update()
