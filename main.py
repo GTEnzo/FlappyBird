@@ -4,11 +4,13 @@ import sys
 import os
 
 FPS = 60
-WIDTH, HEIGHT = 500, 600
+WIDTH, HEIGHT = 450, 600
 SIZE = (WIDTH, HEIGHT)
 BIRD_SIZE = (45, 35)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+
+score = 0
 
 pygame.init()
 screen = pygame.display.set_mode(SIZE)
@@ -179,8 +181,11 @@ class Pipes(pygame.sprite.Sprite):
         self.scrolling = 2
 
     def update(self):
+        global score
         self.x1 -= self.scrolling
         self.x2 -= self.scrolling
+        if self.x1 == 150 or self.x2 == 150:
+            score += 1
         if self.x1 <= -WIDTH:
             self.x1 = 0
         if self.x2 <= -WIDTH:
@@ -191,12 +196,14 @@ class Pipes(pygame.sprite.Sprite):
         screen.blit(self.image2, (self.x1, -585))
         screen.blit(self.image1, (self.x2, 385))
         screen.blit(self.image2, (self.x2, -585))
-        if self.x1 < 0:
-            screen.blit(self.image1, (self.x1 + 500, 385))
-            screen.blit(self.image2, (self.x1 + 500, -585))
-        if self.x2 < 0:
-            screen.blit(self.image1, (self.x2 + 500, 385))
-            screen.blit(self.image2, (self.x2 + 500, -585))
+        if self.x1 < -50:
+            self.x1 = 450
+            screen.blit(self.image1, (self.x1, 385))
+            screen.blit(self.image2, (self.x1, -585))
+        if self.x2 < -50:
+            self.x2 = 450
+            screen.blit(self.image1, (self.x2, 385))
+            screen.blit(self.image2, (self.x2, -585))
 
 
 class Ground(pygame.sprite.Sprite):
@@ -244,6 +251,11 @@ if __name__ == '__main__':
         bird.draw(screen)
         pipes.draw(screen)
         ground.draw(screen)
+
+        font = pygame.font.Font(None, 40)
+
+        score_text = font.render(f'Score: {score}', True, WHITE)
+        screen.blit(score_text, (20, 20))
 
         pygame.display.update()
 
