@@ -25,6 +25,7 @@ def load_image(name, colorkey=None):
     if not os.path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
         sys.exit()
+
     image = pygame.image.load(fullname)
 
     if colorkey is not None:
@@ -179,31 +180,45 @@ class Pipes(pygame.sprite.Sprite):
         self.x1 = 700
         self.x2 = 950
         self.scrolling = 2
+        self.random_y1 = random.randint(200, 450)
+        self.y1 = self.random_y1 - 950
+        self.random_y2 = random.randint(200, 450)
+        self.y2 = self.random_y2 - 950
 
     def update(self):
-        global score
         self.x1 -= self.scrolling
         self.x2 -= self.scrolling
-        if self.x1 == 150 or self.x2 == 150:
-            score += 1
+
         if self.x1 <= -WIDTH:
             self.x1 = 0
         if self.x2 <= -WIDTH:
             self.x2 = 0
 
+    def score(self):
+        global score
+
+        if self.x1 == 150 or self.x2 == 150:
+            score += 1
+            self.random_y1 = random.randint(200, 450)
+            self.y1 = self.random_y1 - 950
+            self.random_y2 = random.randint(200, 450)
+            self.y2 = self.random_y2 - 950
+
     def draw(self, screen):
-        screen.blit(self.image1, (self.x1, 385))
-        screen.blit(self.image2, (self.x1, -585))
-        screen.blit(self.image1, (self.x2, 385))
-        screen.blit(self.image2, (self.x2, -585))
+        screen.blit(self.image1, (self.x1, self.random_y1))
+        screen.blit(self.image2, (self.x1, self.y1))
+        screen.blit(self.image1, (self.x2, self.random_y2))
+        screen.blit(self.image2, (self.x2, self.y2))
+
         if self.x1 < -50:
             self.x1 = 450
-            screen.blit(self.image1, (self.x1, 385))
-            screen.blit(self.image2, (self.x1, -585))
+            screen.blit(self.image1, (self.x1, self.random_y1))
+            screen.blit(self.image2, (self.x1, self.y1))
+
         if self.x2 < -50:
             self.x2 = 450
-            screen.blit(self.image1, (self.x2, 385))
-            screen.blit(self.image2, (self.x2, -585))
+            screen.blit(self.image1, (self.x2, self.random_y2))
+            screen.blit(self.image2, (self.x2, self.y2))
 
 
 class Ground(pygame.sprite.Sprite):
@@ -215,11 +230,13 @@ class Ground(pygame.sprite.Sprite):
 
     def update(self):
         self.x -= self.scrolling
+
         if self.x <= -WIDTH:
             self.x = 0
 
     def draw(self, screen):
         screen.blit(self.image, (self.x, 485))
+
         if self.x < 0:
             screen.blit(self.image, (self.x + 500, 485))
 
