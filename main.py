@@ -181,9 +181,9 @@ class Pipes(pygame.sprite.Sprite):
         self.x2 = 950
         self.scrolling = 2
         self.random_y1 = random.randint(200, 460)
-        self.y1 = self.random_y1 - 950
+        self.y1 = self.random_y1 - 1000
         self.random_y2 = random.randint(200, 460)
-        self.y2 = self.random_y2 - 950
+        self.y2 = self.random_y2 - 1000
 
     def update(self):
         self.x1 -= self.scrolling
@@ -203,6 +203,8 @@ class Pipes(pygame.sprite.Sprite):
         score += 1
 
     def draw(self, screen):
+        global score
+
         screen.blit(self.image1, (self.x1, self.random_y1))
         screen.blit(self.image2, (self.x1, self.y1))
         screen.blit(self.image1, (self.x2, self.random_y2))
@@ -210,7 +212,12 @@ class Pipes(pygame.sprite.Sprite):
 
         if self.x1 < -50:
             self.random_y1 = random.randint(200, 460)
-            self.y1 = self.random_y1 - 950
+            self.y1 = self.random_y1 - 1000
+
+            if score > 38:
+                self.y1 += 30
+            elif score > 18:
+                self.y1 += 15
 
             self.x1 = 450
             screen.blit(self.image1, (self.x1, self.random_y1))
@@ -218,7 +225,12 @@ class Pipes(pygame.sprite.Sprite):
 
         if self.x2 < -50:
             self.random_y2 = random.randint(200, 460)
-            self.y2 = self.random_y2 - 950
+            self.y2 = self.random_y2 - 1000
+
+            if score > 38:
+                self.y2 += 30
+            elif score > 18:
+                self.y2 += 15
 
             self.x2 = 450
             screen.blit(self.image1, (self.x2, self.random_y2))
