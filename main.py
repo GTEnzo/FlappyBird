@@ -1,6 +1,7 @@
 import pygame
 import random
 import sys
+import csv
 import os
 
 FPS = 60
@@ -94,7 +95,28 @@ def leaders_window():
     window = pygame.display.set_mode(SIZE)
     window.fill((0, 122, 116))
 
+    with open('leaderboard.csv', encoding="utf8") as csvfile:
+        file = csv.reader(csvfile, delimiter=';', quotechar='"')
+        leaders = []
+
+        for index, row in enumerate(file):
+            if index > 10:
+                break
+            leaders.append(row)
+
     font = pygame.font.Font(None, 40)
+
+    y = 100
+    place = 1
+    for i in leaders[1:]:
+        name = font.render(f'{place}. {i[0]}:', True, WHITE)
+        screen.blit(name, (100, y))
+
+        points = font.render(f'{i[1]}', True, WHITE)
+        screen.blit(points, (300, y))
+
+        y += 40
+        place += 1
 
     back_button = pygame.Surface((152, 50))
     back_text = font.render('Back', True, BLACK)
