@@ -159,6 +159,7 @@ class Bird(pygame.sprite.Sprite):
         self.shot = 0
         self.image = self.images[self.shot]
         self.rect = self.image.get_rect(topleft=(self.x, self.y))
+        self.mask = pygame.mask.from_surface(self.image)
         self.shots = 5
         self.num = 0
 
@@ -263,6 +264,9 @@ class Ground(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(all_sprites)
         self.image = load_image('ground.png')
+        self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect.bottom = 685
         self.x = 0
         self.scrolling = 2
 
@@ -294,6 +298,10 @@ if __name__ == '__main__':
                 bird.jump()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 bird.jump()
+
+        if pygame.sprite.collide_mask(bird, ground):
+            pygame.quit()
+            sys.exit()
 
         bird.update()
         pipes.update()
