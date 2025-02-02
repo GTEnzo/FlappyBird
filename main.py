@@ -12,6 +12,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
 score = 0
+flag = True
 
 pygame.init()
 screen = pygame.display.set_mode(SIZE)
@@ -300,12 +301,12 @@ if __name__ == '__main__':
                 bird.jump()
 
         if pygame.sprite.collide_mask(bird, ground):
-            pygame.quit()
-            sys.exit()
+            flag = False
 
-        bird.update()
-        pipes.update()
-        ground.update()
+        if flag:
+            bird.update()
+            pipes.update()
+            ground.update()
 
         image = load_image('background.jpg')
         background = pygame.transform.scale(image, SIZE)
