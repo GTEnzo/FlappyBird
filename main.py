@@ -180,9 +180,9 @@ class Pipes(pygame.sprite.Sprite):
         self.x1 = 700
         self.x2 = 950
         self.scrolling = 2
-        self.random_y1 = random.randint(200, 450)
+        self.random_y1 = random.randint(200, 460)
         self.y1 = self.random_y1 - 950
-        self.random_y2 = random.randint(200, 450)
+        self.random_y2 = random.randint(200, 460)
         self.y2 = self.random_y2 - 950
 
     def update(self):
@@ -209,7 +209,7 @@ class Pipes(pygame.sprite.Sprite):
         screen.blit(self.image2, (self.x2, self.y2))
 
         if self.x1 < -50:
-            self.random_y1 = random.randint(200, 450)
+            self.random_y1 = random.randint(200, 460)
             self.y1 = self.random_y1 - 950
 
             self.x1 = 450
@@ -217,7 +217,7 @@ class Pipes(pygame.sprite.Sprite):
             screen.blit(self.image2, (self.x1, self.y1))
 
         if self.x2 < -50:
-            self.random_y2 = random.randint(200, 450)
+            self.random_y2 = random.randint(200, 460)
             self.y2 = self.random_y2 - 950
 
             self.x2 = 450
@@ -256,7 +256,7 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.MOUSEBUTTONUP:
+            if event.type == pygame.MOUSEBUTTONDOWN:
                 bird.jump()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 bird.jump()
