@@ -43,7 +43,7 @@ def start_screen():
 
     image = load_image('logo.png')
     logo = pygame.transform.scale(image, (360, 90))
-    screen.blit(logo, (70, 70))
+    screen.blit(logo, (45, 45))
 
     font = pygame.font.Font(None, 60)
 
@@ -52,14 +52,14 @@ def start_screen():
     start_rect = start_text.get_rect(
         center=(start_button.get_width() / 2,
                 start_button.get_height() / 2))
-    start_button_rect = pygame.Rect(100, 220, 300, 75)
+    start_button_rect = pygame.Rect(75, 220, 300, 75)
 
     leaders_button = pygame.Surface((300, 75))
     leaders_text = font.render('Leaders', True, BLACK)
     leaders_rect = leaders_text.get_rect(
         center=(leaders_button.get_width() / 2,
                 leaders_button.get_height() / 2))
-    leaders_button_rect = pygame.Rect(100, 320, 300, 75)
+    leaders_button_rect = pygame.Rect(75, 320, 300, 75)
 
     while True:
         for event in pygame.event.get():
@@ -90,7 +90,7 @@ def start_screen():
 
 
 def leaders_window():
-    window = pygame.display.set_mode((500, 600))
+    window = pygame.display.set_mode(SIZE)
     window.fill((0, 122, 116))
 
     font = pygame.font.Font(None, 40)
