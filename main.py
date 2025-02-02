@@ -189,6 +189,9 @@ class Pipes(pygame.sprite.Sprite):
         self.x1 -= self.scrolling
         self.x2 -= self.scrolling
 
+        if self.x1 == 150 or self.x2 == 150:
+            self.score()
+
         if self.x1 <= -WIDTH:
             self.x1 = 0
         if self.x2 <= -WIDTH:
@@ -197,12 +200,7 @@ class Pipes(pygame.sprite.Sprite):
     def score(self):
         global score
 
-        if self.x1 == 150 or self.x2 == 150:
-            score += 1
-            self.random_y1 = random.randint(200, 450)
-            self.y1 = self.random_y1 - 950
-            self.random_y2 = random.randint(200, 450)
-            self.y2 = self.random_y2 - 950
+        score += 1
 
     def draw(self, screen):
         screen.blit(self.image1, (self.x1, self.random_y1))
@@ -211,11 +209,17 @@ class Pipes(pygame.sprite.Sprite):
         screen.blit(self.image2, (self.x2, self.y2))
 
         if self.x1 < -50:
+            self.random_y1 = random.randint(200, 450)
+            self.y1 = self.random_y1 - 950
+
             self.x1 = 450
             screen.blit(self.image1, (self.x1, self.random_y1))
             screen.blit(self.image2, (self.x1, self.y1))
 
         if self.x2 < -50:
+            self.random_y2 = random.randint(200, 450)
+            self.y2 = self.random_y2 - 950
+
             self.x2 = 450
             screen.blit(self.image1, (self.x2, self.random_y2))
             screen.blit(self.image2, (self.x2, self.y2))
