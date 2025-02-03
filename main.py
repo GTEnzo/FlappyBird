@@ -12,7 +12,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
 score = 0
-flag = True
+is_alive = True
 
 pygame.init()
 screen = pygame.display.set_mode(SIZE)
@@ -42,6 +42,10 @@ def load_image(name, colorkey=None):
 
 
 def start_screen():
+    global is_alive
+
+    is_alive = True
+
     screen.fill((0, 122, 116))
 
     image = load_image('logo.png')
@@ -71,7 +75,7 @@ def start_screen():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if start_button_rect.collidepoint(event.pos):
-                    return
+                    game_screen()
                 if leaders_button_rect.collidepoint(event.pos):
                     leaders_window()
 
@@ -152,7 +156,7 @@ class Bird(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(all_sprites)
         self.x = 150
-        self.y = 300
+        self.y = 200
         self.gravity = 0.6
         self.jump_strength = -9
         self.boost = 0
@@ -284,8 +288,9 @@ class Ground(pygame.sprite.Sprite):
             screen.blit(self.image, (self.x + 500, 485))
 
 
-if __name__ == '__main__':
-    start_screen()
+def game_screen():
+    global score
+
     bird = Bird()
     pipes = Pipes()
     ground = Ground()
@@ -301,9 +306,9 @@ if __name__ == '__main__':
                 bird.jump()
 
         if pygame.sprite.collide_mask(bird, ground):
-            flag = False
-
-        if flag:
+            score = 0
+            end_screen()
+        else:
             bird.update()
             pipes.update()
             ground.update()
@@ -324,3 +329,35 @@ if __name__ == '__main__':
         pygame.display.update()
 
         clock.tick(FPS)
+
+
+def end_screen():
+    global is_alive, score
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                game_screen()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_m:
+                score = 0
+                start_screen()
+
+        font = pygame.font.Font(None, 30)
+
+        text1 = font.render(f'Game over!', True, WHITE)
+        text2 = font.render(f'Click SPACE to restart.', True, WHITE)
+        text3 = font.render(f'Click M to move in menu', True, WHITE)
+        screen.blit(text1, (100, 100))
+        screen.blit(text2, (100, 200))
+        screen.blit(text3, (100, 250))
+
+        pygame.display.update()
+
+        clock.tick(FPS)
+
+
+start_screen()
