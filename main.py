@@ -10,6 +10,7 @@ SIZE = (WIDTH, HEIGHT)
 BIRD_SIZE = (45, 35)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+BLUE = (0, 122, 116)
 
 score = 0
 is_alive = True
@@ -182,7 +183,7 @@ def start_screen():
 
     is_alive = True
 
-    screen.fill((0, 122, 116))
+    screen.fill(BLUE)
 
     image = load_image('logo.png')
     logo = pygame.transform.scale(image, (360, 90))
@@ -234,30 +235,28 @@ def start_screen():
 
 def leaders_window():
     window = pygame.display.set_mode(SIZE)
-    window.fill((0, 122, 116))
+    window.fill(BLUE)
 
     with open('leaderboard.csv', encoding="utf8") as csvfile:
-        file = csv.reader(csvfile, delimiter=';', quotechar='"')
-        leaders = []
-
-        for index, row in enumerate(file):
-            if index > 10:
-                break
-            leaders.append(row)
+        file = csv.DictReader(csvfile, delimiter=';', quotechar='"')
+        leaders = sorted(file, key=lambda x: int(x['points']), reverse=True)
 
     font = pygame.font.Font(None, 40)
 
     y = 100
     place = 1
-    for i in leaders[1:]:
-        name = font.render(f'{place}. {i[0]}:', True, WHITE)
+    for i in leaders:
+        name = font.render(f'{place}. {i["name"]}:', True, WHITE)
         screen.blit(name, (100, y))
 
-        points = font.render(f'{i[1]}', True, WHITE)
+        points = font.render(f'{i["points"]}', True, WHITE)
         screen.blit(points, (300, y))
 
         y += 40
-        place += 1
+        if place < 10:
+            place += 1
+        else:
+            break
 
     back_button = pygame.Surface((152, 50))
     back_text = font.render('Back', True, BLACK)
@@ -314,6 +313,7 @@ def game_screen():
 
             score = 0
             end_screen()
+
         else:
             bird.update()
             pipes.update()
@@ -357,6 +357,7 @@ def end_screen():
         text1 = font.render(f'Game over!', True, WHITE)
         text2 = font.render(f'Click SPACE to restart.', True, WHITE)
         text3 = font.render(f'Click M to move in menu', True, WHITE)
+
         screen.blit(text1, (100, 100))
         screen.blit(text2, (100, 200))
         screen.blit(text3, (100, 250))
