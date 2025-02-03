@@ -30,11 +30,11 @@ class Bird(pygame.sprite.Sprite):
         self.gravity = 0.6
         self.jump_strength = -9
         self.boost = 0
-        self.images = [pygame.transform.scale(load_image(f'bird{i}.png'), BIRD_SIZE) for i in range(1, 4)]
+        self.bird_shots = [pygame.transform.scale(load_image(f'bird{i}.png'), BIRD_SIZE) for i in range(1, 4)]
         self.shot = 0
-        self.image = self.images[self.shot]
-        self.rect = self.image.get_rect(topleft=(self.x, self.y))
-        self.mask = pygame.mask.from_surface(self.image)
+        self.bird = self.bird_shots[self.shot]
+        self.rect = self.bird.get_rect(topleft=(self.x, self.y))
+        self.mask = pygame.mask.from_surface(self.bird)
         self.shots = 5
         self.num = 0
 
@@ -54,27 +54,27 @@ class Bird(pygame.sprite.Sprite):
         self.num += 1
         if self.num >= self.shots:
             self.num = 0
-            self.shot = (self.shot + 1) % len(self.images)
-            self.image = self.images[self.shot]
+            self.shot = (self.shot + 1) % len(self.bird_shots)
+            self.bird = self.bird_shots[self.shot]
 
         if self.boost < 0:
-            self.image = pygame.transform.rotate(self.images[self.shot], min(25, max(0, -self.boost * 4)))
+            self.bird = pygame.transform.rotate(self.bird_shots[self.shot], min(25, max(0, -self.boost * 4)))
         elif self.boost > 0:
-            self.image = pygame.transform.rotate(self.images[self.shot], max(-70, min(0, self.boost * -8)))
+            self.bird = pygame.transform.rotate(self.bird_shots[self.shot], max(-70, min(0, self.boost * -8)))
         else:
-            self.image = self.images[self.shot]
+            self.bird = self.bird_shots[self.shot]
 
-        self.rect = self.image.get_rect(center=self.rect.center)
+        self.rect = self.bird.get_rect(center=self.rect.center)
 
     def draw(self, screen):
-        screen.blit(self.image, self.rect)
+        screen.blit(self.bird, self.rect)
 
 
 class Pipes(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(all_sprites)
-        self.image1 = load_image('pipe1.png')
-        self.image2 = load_image('pipe2.png')
+        self.pipe_b = load_image('pipe1.png')
+        self.pipe_t = load_image('pipe2.png')
         self.x1 = 700
         self.x2 = 950
         self.scrolling = 2
@@ -103,10 +103,10 @@ class Pipes(pygame.sprite.Sprite):
     def draw(self, screen):
         global score
 
-        screen.blit(self.image1, (self.x1, self.random_y1))
-        screen.blit(self.image2, (self.x1, self.y1))
-        screen.blit(self.image1, (self.x2, self.random_y2))
-        screen.blit(self.image2, (self.x2, self.y2))
+        screen.blit(self.pipe_b, (self.x1, self.random_y1))
+        screen.blit(self.pipe_t, (self.x1, self.y1))
+        screen.blit(self.pipe_b, (self.x2, self.random_y2))
+        screen.blit(self.pipe_t, (self.x2, self.y2))
 
         if self.x1 < -50:
             self.random_y1 = random.randint(200, 460)
@@ -118,8 +118,8 @@ class Pipes(pygame.sprite.Sprite):
                 self.y1 += 15
 
             self.x1 = 450
-            screen.blit(self.image1, (self.x1, self.random_y1))
-            screen.blit(self.image2, (self.x1, self.y1))
+            screen.blit(self.pipe_b, (self.x1, self.random_y1))
+            screen.blit(self.pipe_t, (self.x1, self.y1))
 
         if self.x2 < -50:
             self.random_y2 = random.randint(200, 460)
@@ -131,16 +131,16 @@ class Pipes(pygame.sprite.Sprite):
                 self.y2 += 15
 
             self.x2 = 450
-            screen.blit(self.image1, (self.x2, self.random_y2))
-            screen.blit(self.image2, (self.x2, self.y2))
+            screen.blit(self.pipe_b, (self.x2, self.random_y2))
+            screen.blit(self.pipe_t, (self.x2, self.y2))
 
 
 class Ground(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(all_sprites)
-        self.image = load_image('ground.png')
-        self.rect = self.image.get_rect()
-        self.mask = pygame.mask.from_surface(self.image)
+        self.ground = load_image('ground.png')
+        self.rect = self.ground.get_rect()
+        self.mask = pygame.mask.from_surface(self.ground)
         self.rect.bottom = 685
         self.x = 0
         self.scrolling = 2
@@ -152,10 +152,10 @@ class Ground(pygame.sprite.Sprite):
             self.x = 0
 
     def draw(self, screen):
-        screen.blit(self.image, (self.x, 485))
+        screen.blit(self.ground, (self.x, 485))
 
         if self.x < 0:
-            screen.blit(self.image, (self.x + 500, 485))
+            screen.blit(self.ground, (self.x + 500, 485))
 
 
 def load_image(name, colorkey=None):
@@ -185,8 +185,7 @@ def start_screen():
 
     screen.fill(BLUE)
 
-    image = load_image('logo.png')
-    logo = pygame.transform.scale(image, (360, 90))
+    logo = pygame.transform.scale(load_image('logo.png'), (360, 90))
     screen.blit(logo, (45, 45))
 
     font = pygame.font.Font(None, 60)
@@ -319,8 +318,7 @@ def game_screen():
             pipes.update()
             ground.update()
 
-        image = load_image('background.jpg')
-        background = pygame.transform.scale(image, SIZE)
+        background = pygame.transform.scale(load_image('background.jpg'), SIZE)
         screen.blit(background, (0, 0))
 
         bird.draw(screen)
