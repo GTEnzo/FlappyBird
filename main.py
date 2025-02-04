@@ -293,7 +293,7 @@ def records_window():
 
 
 def game_screen():
-    global score
+    global score, is_alive, is_flying
 
     bird = Bird()
     pipes = Pipes()
@@ -308,6 +308,11 @@ def game_screen():
                 bird.jump()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 bird.jump()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_m:
+                is_alive = False
+                is_flying = False
+                score = 0
+                start_screen()
 
         if pygame.sprite.collide_mask(bird, ground):
             with open('records.csv', 'a', newline='', encoding="utf8") as csvfile:
