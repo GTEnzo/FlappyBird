@@ -1,9 +1,10 @@
-import csv
 import datetime as dt
-import os
 import pygame
+from pygame import mixer
 import random
 import sys
+import csv
+import os
 
 '''Константы'''
 FPS = 60  # кадры в секунду
@@ -22,10 +23,14 @@ random_number = random.randint(-750, -550)  # используется для р
 
 '''Вызов pygame'''
 pygame.init()
+mixer.init()
 screen = pygame.display.set_mode(SIZE)
 pygame.display.set_caption('Flappy Bird')
 clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
+flap_sound = mixer.Sound(os.path.join('data', 'flap.wav'))
+pipes_sound = mixer.Sound(os.path.join('data', 'pipes.wav'))
+end_sound = mixer.Sound(os.path.join('data', 'end.wav'))
 
 
 class Bird(pygame.sprite.Sprite):
@@ -50,6 +55,7 @@ class Bird(pygame.sprite.Sprite):
         if not is_flying:
             is_flying = True
 
+        flap_sound.play()
         self.boost = self.jump_strength
 
     def update(self):
@@ -98,6 +104,7 @@ class TopPipe(pygame.sprite.Sprite):
 
         if self.rect.x == 150:
             score += 1
+            pipes_sound.play()
 
         if self.rect.right < 0:
             self.kill()
@@ -203,6 +210,13 @@ def start_screen():
                 leaders_button.get_height() / 2))
     leaders_button_rect = pygame.Rect(75, 320, 300, 75)
 
+    settings_button = pygame.Surface((300, 75))
+    settings_text = font.render('Settings', True, BLACK)
+    settings_rect = settings_text.get_rect(
+        center=(settings_button.get_width() / 2,
+                settings_button.get_height() / 2))
+    settings_button_rect = pygame.Rect(75, 420, 300, 75)
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -213,6 +227,8 @@ def start_screen():
                     game_screen()
                 if leaders_button_rect.collidepoint(event.pos):
                     records_window()
+                if settings_button_rect.collidepoint(event.pos):
+                    settings_window()
 
         if start_button_rect.collidepoint(pygame.mouse.get_pos()):
             pygame.draw.rect(start_button, (141, 199, 63), (1, 1, 298, 73))
@@ -228,7 +244,79 @@ def start_screen():
         leaders_button.blit(leaders_text, leaders_rect)
         screen.blit(leaders_button, (leaders_button_rect.x, leaders_button_rect.y))
 
+        if settings_button_rect.collidepoint(pygame.mouse.get_pos()):
+            pygame.draw.rect(settings_button, (141, 199, 63), (1, 1, 298, 73))
+        else:
+            pygame.draw.rect(settings_button, (255, 251, 214), (1, 1, 298, 73))
+        settings_button.blit(settings_text, settings_rect)
+        screen.blit(settings_button, (settings_button_rect.x, settings_button_rect.y))
+
         pygame.display.update()
+
+
+def settings_window():
+    global flap_sound
+
+    running = True
+    volume1 = flap_sound.get_volume()
+    volume2 = pipes_sound.get_volume()
+    volume3 = end_sound.get_volume()
+
+    font = pygame.font.Font(None, 40)
+    small_font = pygame.font.Font(None, 30)
+
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if back_button_rect.collidepoint(event.pos):
+                    running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    volume1 = max(0, volume1 - 0.05)
+                    volume2 = max(0, volume2 - 0.05)
+                    volume3 = max(0, volume3 - 0.05)
+                    flap_sound.set_volume(volume1)
+                    pipes_sound.set_volume(volume2)
+                    end_sound.set_volume(volume3)
+
+                if event.key == pygame.K_RIGHT:
+                    volume1 = max(0, volume1 + 0.05)
+                    volume2 = max(0, volume2 + 0.05)
+                    volume3 = max(0, volume3 + 0.05)
+                    flap_sound.set_volume(volume1)
+                    pipes_sound.set_volume(volume2)
+                    end_sound.set_volume(volume3)
+
+        screen.fill(BLUE)
+
+        volume_text = font.render(f'Volume: {int(volume1 * 100)}%', True, WHITE)
+        screen.blit(volume_text, (50, 200))
+
+        instruction_text = small_font.render('Use LEFT/RIGHT', True, WHITE)
+        instruction_text2 = small_font.render('arrows to adjust volume', True, WHITE)
+        screen.blit(instruction_text, (50, 120))
+        screen.blit(instruction_text2, (50, 150))
+
+        back_button = pygame.Surface((152, 50))
+        back_text = font.render('Back', True, BLACK)
+        back_rect = back_text.get_rect(
+            center=(back_button.get_width() / 2,
+                    back_button.get_height() / 2))
+        back_button_rect = pygame.Rect(5, 5, 152, 50)
+
+        if back_button_rect.collidepoint(pygame.mouse.get_pos()):
+            pygame.draw.rect(back_button, (141, 199, 63), (1, 1, 150, 48))
+        else:
+            pygame.draw.rect(back_button, (255, 251, 214), (1, 1, 150, 48))
+        back_button.blit(back_text, back_rect)
+        screen.blit(back_button, (back_button_rect.x, back_button_rect.y))
+
+        pygame.display.update()
+
+    start_screen()
 
 
 def records_window():
@@ -244,9 +332,9 @@ def records_window():
     y = 100
     place = 1
     for i in records:
-        name = font.render(f'{place}. {i["name"]}:', True, WHITE)
+        name = font.render(f'{place}. {i['name']}:', True, WHITE)
         screen.blit(name, (50, y))
-        points = font.render(f'{i["points"]}', True, WHITE)
+        points = font.render(f'{i['points']}', True, WHITE)
         screen.blit(points, (350, y))
 
         y += 40
@@ -354,6 +442,7 @@ def game_screen():
                 writer.writerow([dt.datetime.now().date(), score])
 
             score = 0
+            end_sound.play()
             end_screen()
 
         else:
