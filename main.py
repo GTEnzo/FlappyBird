@@ -5,19 +5,22 @@ import pygame
 import random
 import sys
 
-FPS = 60
-WIDTH, HEIGHT = 450, 600
-SIZE = (WIDTH, HEIGHT)
-BIRD_SIZE = (45, 35)
+'''Константы'''
+FPS = 60  # кадры в секунду
+SIZE = (WIDTH, HEIGHT) = (450, 600)  # размер окна
+BIRD_SIZE = (45, 35)  # размер птички
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 BLUE = (0, 122, 116)
 
-score = 0
-is_alive = True
-is_flying = False
-random_number = random.randint(-750, -550)
+'''Глобальные переменные'''
+score = 0  # очки
+scrolling = 2  # скорость труб и земли
+is_alive = True  # жива ли птичка
+is_flying = False  # начата ли игра
+random_number = random.randint(-750, -550)  # используется для рандомной генерации "y" труб
 
+'''Вызов pygame'''
 pygame.init()
 screen = pygame.display.set_mode(SIZE)
 pygame.display.set_caption('Flappy Bird')
@@ -55,6 +58,7 @@ class Bird(pygame.sprite.Sprite):
         if is_flying:
             self.boost += self.gravity
             self.rect.y += self.boost
+
             if self.rect.y > HEIGHT - 150:
                 self.rect.y = HEIGHT - 150
                 self.boost = 0
@@ -80,7 +84,6 @@ class TopPipe(pygame.sprite.Sprite):
     def __init__(self, x):
         super().__init__(all_sprites)
         self.image = load_image('top_pipe.png')
-        self.scrolling = 2
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.mask = pygame.mask.from_surface(self.image)
@@ -89,12 +92,13 @@ class TopPipe(pygame.sprite.Sprite):
         self.rect.y = r
 
     def update(self):
-        global score
+        global score, scrolling
 
-        self.rect.x -= self.scrolling
+        self.rect.x -= scrolling
 
         if self.rect.x == 150:
             score += 1
+
         if self.rect.right < 0:
             self.kill()
 
@@ -110,7 +114,6 @@ class BottomPipe(pygame.sprite.Sprite):
     def __init__(self, x):
         super().__init__(all_sprites)
         self.image = load_image('bottom_pipe.png')
-        self.scrolling = 2
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.mask = pygame.mask.from_surface(self.image)
@@ -119,7 +122,9 @@ class BottomPipe(pygame.sprite.Sprite):
         self.rect.y = r
 
     def update(self):
-        self.rect.x -= self.scrolling
+        global scrolling
+
+        self.rect.x -= scrolling
 
         if self.rect.right < 0:
             self.kill()
@@ -135,44 +140,40 @@ class BottomPipe(pygame.sprite.Sprite):
 class Ground(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(all_sprites)
-        self.ground = load_image('ground.png')
-        self.rect = self.ground.get_rect()
-        self.mask = pygame.mask.from_surface(self.ground)
+        self.image = load_image('ground.png')
+        self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect.bottom = 700
-        self.x = 0
-        self.scrolling = 2
+        self.rect.x = 0
 
     def update(self):
-        self.x -= self.scrolling
+        global scrolling
 
-        if self.x <= -WIDTH:
-            self.x = 0
+        self.rect.x -= scrolling
+
+        if self.rect.x <= -WIDTH:
+            self.rect.x = 0
 
     def draw(self, screen):
-        screen.blit(self.ground, (self.x, 485))
+        screen.blit(self.image, (self.rect.x, 485))
 
-        if self.x < 0:
-            screen.blit(self.ground, (self.x + 500, 485))
+        if self.rect.x < 0:
+            screen.blit(self.image, (self.rect.x + 500, 485))
 
 
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
-
     if not os.path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
         sys.exit()
-
     image = pygame.image.load(fullname)
-
     if colorkey is not None:
         image = image.convert()
         if colorkey == -1:
             colorkey = image.get_at((0, 0))
         image.set_colorkey(colorkey)
-
     else:
         image = image.convert_alpha()
-
     return image
 
 
@@ -183,8 +184,8 @@ def start_screen():
 
     screen.fill(BLUE)
 
-    logo = pygame.transform.scale(load_image('logo.png'), (360, 90))
-    screen.blit(logo, (45, 45))
+    image = pygame.transform.scale(load_image('logo.png'), (360, 90))
+    screen.blit(image, (45, 45))
 
     font = pygame.font.Font(None, 60)
 
@@ -302,10 +303,7 @@ def game_screen():
     pipe4.get_num(random_number + 1000)
 
     pipes = pygame.sprite.Group()
-    pipes.add(pipe1)
-    pipes.add(pipe2)
-    pipes.add(pipe3)
-    pipes.add(pipe4)
+    pipes.add(pipe1, pipe2, pipe3, pipe4)
 
     ground = Ground()
 
@@ -319,9 +317,9 @@ def game_screen():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 bird.jump()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_m:
+                score = 0
                 is_alive = False
                 is_flying = False
-                score = 0
                 start_screen()
 
         if pipe1.rect.x <= -50:
@@ -333,8 +331,7 @@ def game_screen():
             pipe1.get_num(random_number)
             pipe3.get_num(random_number + 1000)
 
-            pipes.add(pipe1)
-            pipes.add(pipe3)
+            pipes.add(pipe1, pipe3)
 
         if pipe2.rect.x <= -50:
             pipe2 = TopPipe(450)
@@ -345,8 +342,7 @@ def game_screen():
             pipe2.get_num(random_number)
             pipe4.get_num(random_number + 1000)
 
-            pipes.add(pipe2)
-            pipes.add(pipe4)
+            pipes.add(pipe2, pipe4)
 
         if pygame.sprite.collide_mask(bird, ground) or pygame.sprite.spritecollide(bird, pipes,
                                                                                    False) or bird.rect.y < -200:
@@ -366,8 +362,8 @@ def game_screen():
                 pipes.update()
             ground.update()
 
-        background = pygame.transform.scale(load_image('background.jpg'), SIZE)
-        screen.blit(background, (0, 0))
+        image = pygame.transform.scale(load_image('background.jpg'), SIZE)
+        screen.blit(image, (0, 0))
 
         bird.draw(screen)
         if is_alive:
@@ -376,8 +372,8 @@ def game_screen():
 
         font = pygame.font.Font(None, 40)
 
-        score_text = font.render(f'Score: {score}', True, WHITE)
-        screen.blit(score_text, (20, 20))
+        text = font.render(f'Score: {score}', True, WHITE)
+        screen.blit(text, (20, 20))
 
         pygame.display.update()
 
@@ -393,23 +389,23 @@ def end_screen():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_m:
+                score = 0
+                is_flying = False
+                start_screen()
+            if (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE) or event.type == pygame.MOUSEBUTTONDOWN:
                 is_flying = False
                 game_screen()
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_m:
-                is_flying = False
-                score = 0
-                start_screen()
 
         font = pygame.font.Font(None, 30)
 
         text1 = font.render(f'Game over!', True, WHITE)
         text2 = font.render(f'Click SPACE to restart.', True, WHITE)
-        text3 = font.render(f'Click M to move in menu', True, WHITE)
+        text3 = font.render(f'Click M or left button to move in menu', True, WHITE)
 
-        screen.blit(text1, (100, 100))
-        screen.blit(text2, (100, 200))
-        screen.blit(text3, (100, 250))
+        screen.blit(text1, (50, 100))
+        screen.blit(text2, (50, 200))
+        screen.blit(text3, (50, 250))
 
         pygame.display.update()
 
