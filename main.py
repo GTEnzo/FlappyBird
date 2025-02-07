@@ -37,16 +37,17 @@ pipes_sound = mixer.Sound(os.path.join('data', 'pipes.wav'))
 end_sound = mixer.Sound(os.path.join('data', 'end.wav'))
 
 
-class Bird(pygame.sprite.Sprite):  # спрайт птички
+class Bird(pygame.sprite.Sprite):  # спрайт птицки
     def __init__(self):
         super().__init__(all_sprites)
         self.gravity = 0.6
-        self.jump_strength = -9
-        self.boost = 0
+        self.jump_strength = -9  # Высота прыжка
+        self.boost = 0  # Вертикальная скорость
+        # Cписок изображений, которые используются для анимации птички в игре
         self.bird_shots = [pygame.transform.scale(load_image(f'bird{i}.png'), BIRD_SIZE) for i in range(1, 4)]
-        self.shot = 0
-        self.image = self.bird_shots[self.shot]
-        self.rect = self.image.get_rect()
+        self.shot = 0  # Кадр
+        self.image = self.bird_shots[self.shot]  # Хранение текущего изображения
+        self.rect = self.image.get_rect()  # Прямоугольник для текущего изображения птички
         self.rect.x = 150
         self.rect.y = 280
         self.mask = pygame.mask.from_surface(self.image)
@@ -60,29 +61,31 @@ class Bird(pygame.sprite.Sprite):  # спрайт птички
             is_flying = True
 
         flap_sound.play()
-        self.boost = self.jump_strength
+        self.boost = self.jump_strength  # Птичка прыгнула
 
     def update(self):
-        self.mask = pygame.mask.from_surface(self.image)
+        self.mask = pygame.mask.from_surface(self.image)  # Создание маски
 
-        if is_flying:
-            self.boost += self.gravity
-            self.rect.y += self.boost
+        if is_flying: # Если птицка прыгнула
+            self.boost += self.gravity  # Эфект гравитации
+            self.rect.y += self.boost  # Обновление вертикальной позиции птички
 
-            if self.rect.y > HEIGHT - 150:
+            if self.rect.y > HEIGHT - 150:  # Проверка на выход птички за приделы экрана
                 self.rect.y = HEIGHT - 150
                 self.boost = 0
 
         self.num += 1
         if self.num >= self.shots:
             self.num = 0
-            self.shot = (self.shot + 1) % len(self.bird_shots)
-            self.image = self.bird_shots[self.shot]
+            self.shot = (self.shot + 1) % len(self.bird_shots)  # Текущий кадр
+            self.image = self.bird_shots[self.shot]  # Замена кадра
 
         if self.boost < 0:
-            self.image = pygame.transform.rotate(self.bird_shots[self.shot], min(25, max(0, -self.boost * 4)))
+            # Вращение изображения птички в зависимости от её вертикальной скорости при взлете
+            self.image = pygame.transform.rotate(self.bird_shots[self.shot], min(30, -self.boost * 4))
         elif self.boost > 0:
-            self.image = pygame.transform.rotate(self.bird_shots[self.shot], max(-70, min(0, self.boost * -8)))
+            # Вращение изображения птички в зависимости от её вертикальной скорости при падении
+            self.image = pygame.transform.rotate(self.bird_shots[self.shot], max(-70, self.boost * -8))
         else:
             self.image = self.bird_shots[self.shot]
 
@@ -186,7 +189,7 @@ def load_image(name, colorkey=None):  # импорт картинок
     return image
 
 
-def start_screen():  # начальное окно
+def start_screen():
     global is_alive
 
     is_alive = True
@@ -198,6 +201,7 @@ def start_screen():  # начальное окно
 
     font = pygame.font.Font(None, 60)
 
+    ''' Кнопка "Start" '''
     start_button = pygame.Surface((300, 75))
     start_text = font.render('Start', True, BLACK)
     start_rect = start_text.get_rect(
@@ -205,6 +209,7 @@ def start_screen():  # начальное окно
                 start_button.get_height() / 2))
     start_button_rect = pygame.Rect(75, 220, 300, 75)
 
+    ''' Кнопка "Records" '''
     leaders_button = pygame.Surface((300, 75))
     leaders_text = font.render('Records', True, BLACK)
     leaders_rect = leaders_text.get_rect(
@@ -212,6 +217,7 @@ def start_screen():  # начальное окно
                 leaders_button.get_height() / 2))
     leaders_button_rect = pygame.Rect(75, 320, 300, 75)
 
+    ''' Кнопка "Settings" '''
     settings_button = pygame.Surface((300, 75))
     settings_text = font.render('Settings', True, BLACK)
     settings_rect = settings_text.get_rect(
@@ -256,7 +262,7 @@ def start_screen():  # начальное окно
         pygame.display.update()
 
 
-def settings_window():  # окно настроек
+def settings_window():
     global flap_sound
 
     running = True
@@ -285,16 +291,16 @@ def settings_window():  # окно настроек
                     end_sound.set_volume(volume3)
 
                 if event.key == pygame.K_RIGHT:
-                    volume1 = max(0, volume1 + 0.05)
-                    volume2 = max(0, volume2 + 0.05)
-                    volume3 = max(0, volume3 + 0.05)
+                    volume1 = min(1, volume1 + 0.05)
+                    volume2 = min(1, volume2 + 0.05)
+                    volume3 = min(1, volume3 + 0.05)
                     flap_sound.set_volume(volume1)
                     pipes_sound.set_volume(volume2)
                     end_sound.set_volume(volume3)
 
         screen.fill(BLUE)
 
-        volume_text = font.render(f'Volume: {int(volume1 * 100)}%', True, WHITE)
+        volume_text = font.render(f'Volume: {int(volume1 * 20)}', True, WHITE)
         screen.blit(volume_text, (50, 200))
 
         instruction_text = small_font.render('Use LEFT/RIGHT', True, WHITE)
@@ -302,6 +308,7 @@ def settings_window():  # окно настроек
         screen.blit(instruction_text, (50, 120))
         screen.blit(instruction_text2, (50, 150))
 
+        ''' Кнопка "Back" '''
         back_button = pygame.Surface((152, 50))
         back_text = font.render('Back', True, BLACK)
         back_rect = back_text.get_rect(
