@@ -1,6 +1,6 @@
+from pygame import mixer
 import datetime as dt
 import pygame
-from pygame import mixer
 import random
 import sys
 import csv
@@ -10,6 +10,8 @@ import os
 FPS = 60  # кадры в секунду
 SIZE = (WIDTH, HEIGHT) = (450, 600)  # размер окна
 BIRD_SIZE = (45, 35)  # размер птички
+
+'''Используемые цвета'''
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 BLUE = (0, 122, 116)
@@ -28,12 +30,14 @@ screen = pygame.display.set_mode(SIZE)
 pygame.display.set_caption('Flappy Bird')
 clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
+
+'''Звуки'''
 flap_sound = mixer.Sound(os.path.join('data', 'flap.wav'))
 pipes_sound = mixer.Sound(os.path.join('data', 'pipes.wav'))
 end_sound = mixer.Sound(os.path.join('data', 'end.wav'))
 
 
-class Bird(pygame.sprite.Sprite):
+class Bird(pygame.sprite.Sprite):  # спрайт птички
     def __init__(self):
         super().__init__(all_sprites)
         self.gravity = 0.6
@@ -86,7 +90,7 @@ class Bird(pygame.sprite.Sprite):
         screen.blit(self.image, self.rect)
 
 
-class TopPipe(pygame.sprite.Sprite):
+class TopPipe(pygame.sprite.Sprite):  # спрайт верхней трубы
     def __init__(self, x):
         super().__init__(all_sprites)
         self.image = load_image('top_pipe.png')
@@ -94,30 +98,29 @@ class TopPipe(pygame.sprite.Sprite):
         self.rect.x = x
         self.mask = pygame.mask.from_surface(self.image)
 
-    def get_num(self, r):
-        self.rect.y = r
+    def get_random_number(self, r):  # импорт рандомного значения
+        self.rect.y = r  # присваевание "y"-у трубы рандомное значение
 
-    def update(self):
+    def update(self):  # обновление координат труб и начисление очков
         global score, scrolling
 
-        self.rect.x -= scrolling
+        self.rect.x -= scrolling  # движение трубы
 
-        if self.rect.x == 150:
-            score += 1
+        if self.rect.x == 150:  # если птичка пролетела трубу...
+            score += 1  # ...+1 очко
             pipes_sound.play()
 
-        if self.rect.right < 0:
-            self.kill()
+        if self.rect.right < 0:  # если труба не в пределах экрана...
+            self.kill()  # ...она удаляется
 
-    def draw(self, screen):
-        if self.rect.x < -50:
-            self.rect.x = 450
+    def draw(self, screen):  # рисование труб
+        if self.rect.x < -50:  # если труба пропала...
+            self.rect.x = 450  # ...она перемещается обратно
 
-        self.rect.y = random.randint(-750, -550)
         screen.blit(self.image, (self.rect.x, self.rect.y))
 
 
-class BottomPipe(pygame.sprite.Sprite):
+class BottomPipe(pygame.sprite.Sprite):  # спрайт нижней трубы
     def __init__(self, x):
         super().__init__(all_sprites)
         self.image = load_image('bottom_pipe.png')
@@ -125,26 +128,25 @@ class BottomPipe(pygame.sprite.Sprite):
         self.rect.x = x
         self.mask = pygame.mask.from_surface(self.image)
 
-    def get_num(self, r):
-        self.rect.y = r
+    def get_random_number(self, r):  # импорт рандомного значения
+        self.rect.y = r  # присваевание "y"-у трубы рандомное значение
 
-    def update(self):
+    def update(self):  # обновление координат труб
         global scrolling
 
-        self.rect.x -= scrolling
+        self.rect.x -= scrolling  # движение трубы
 
-        if self.rect.right < 0:
-            self.kill()
+        if self.rect.right < 0:  # если труба не в пределах экрана...
+            self.kill()  # ...она удаляется
 
-    def draw(self, screen):
-        if self.rect.x < -50:
-            self.rect.x = 450
+    def draw(self, screen):  # рисование труб
+        if self.rect.x < -50:  # если труба пропала...
+            self.rect.x = 450  # ...она перемещается обратно
 
-        self.rect.y = random.randint(-750, -550)
         screen.blit(self.image, (self.rect.x, self.rect.y + 1000))
 
 
-class Ground(pygame.sprite.Sprite):
+class Ground(pygame.sprite.Sprite):  # спрайт земли
     def __init__(self):
         super().__init__(all_sprites)
         self.image = load_image('ground.png')
@@ -153,22 +155,22 @@ class Ground(pygame.sprite.Sprite):
         self.rect.bottom = 700
         self.rect.x = 0
 
-    def update(self):
+    def update(self):  # обновление координат земли
         global scrolling
 
-        self.rect.x -= scrolling
+        self.rect.x -= scrolling  # движение земли
 
-        if self.rect.x <= -WIDTH:
-            self.rect.x = 0
+        if self.rect.right <= 0:  # если земля полностью исчезла...
+            self.rect.x = 0  # ...она возвращается в пределы окна
 
-    def draw(self, screen):
+    def draw(self, screen):  # рисование земли
         screen.blit(self.image, (self.rect.x, 485))
 
-        if self.rect.x < 0:
-            screen.blit(self.image, (self.rect.x + 500, 485))
+        if self.rect.x < 0:  # если земля начала пропадать справа...
+            screen.blit(self.image, (self.rect.x + 500, 485))  # ...сшиваем две земли
 
 
-def load_image(name, colorkey=None):
+def load_image(name, colorkey=None):  # импорт картинок
     fullname = os.path.join('data', name)
     if not os.path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
@@ -184,7 +186,7 @@ def load_image(name, colorkey=None):
     return image
 
 
-def start_screen():
+def start_screen():  # начальное окно
     global is_alive
 
     is_alive = True
@@ -254,7 +256,7 @@ def start_screen():
         pygame.display.update()
 
 
-def settings_window():
+def settings_window():  # окно настроек
     global flap_sound
 
     running = True
@@ -319,7 +321,7 @@ def settings_window():
     start_screen()
 
 
-def records_window():
+def records_window():  # окно рекордов
     window = pygame.display.set_mode(SIZE)
     window.fill(BLUE)
 
@@ -332,9 +334,9 @@ def records_window():
     y = 100
     place = 1
     for i in records:
-        name = font.render(f'{place}. {i['name']}:', True, WHITE)
+        name = font.render(f'{place}. {i["name"]}:', True, WHITE)
         screen.blit(name, (50, y))
-        points = font.render(f'{i['points']}', True, WHITE)
+        points = font.render(f'{i["points"]}', True, WHITE)
         screen.blit(points, (350, y))
 
         y += 40
@@ -372,7 +374,7 @@ def records_window():
     start_screen()
 
 
-def game_screen():
+def game_screen():  # игровое окно
     global score, is_alive, is_flying, random_number
 
     bird = Bird()
@@ -382,13 +384,13 @@ def game_screen():
     pipe3 = BottomPipe(700)
     pipe4 = BottomPipe(950)
 
-    pipe1.get_num(random_number)
-    pipe3.get_num(random_number + 1000)
+    pipe1.get_random_number(random_number)
+    pipe3.get_random_number(random_number + 1000)
 
     random_number = random.randint(-750, -550)
 
-    pipe2.get_num(random_number)
-    pipe4.get_num(random_number + 1000)
+    pipe2.get_random_number(random_number)
+    pipe4.get_random_number(random_number + 1000)
 
     pipes = pygame.sprite.Group()
     pipes.add(pipe1, pipe2, pipe3, pipe4)
@@ -416,8 +418,8 @@ def game_screen():
 
             random_number = random.randint(-750, -550)
 
-            pipe1.get_num(random_number)
-            pipe3.get_num(random_number + 1000)
+            pipe1.get_random_number(random_number)
+            pipe3.get_random_number(random_number + 1000)
 
             pipes.add(pipe1, pipe3)
 
@@ -427,8 +429,8 @@ def game_screen():
 
             random_number = random.randint(-750, -550)
 
-            pipe2.get_num(random_number)
-            pipe4.get_num(random_number + 1000)
+            pipe2.get_random_number(random_number)
+            pipe4.get_random_number(random_number + 1000)
 
             pipes.add(pipe2, pipe4)
 
@@ -469,7 +471,7 @@ def game_screen():
         clock.tick(FPS)
 
 
-def end_screen():
+def end_screen():  # конец игры
     global score, is_alive, is_flying
 
     running = True
@@ -501,4 +503,4 @@ def end_screen():
         clock.tick(FPS)
 
 
-start_screen()
+start_screen()  # вызов начального окна
