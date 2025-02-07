@@ -15,6 +15,8 @@ BIRD_SIZE = (45, 35)  # размер птички
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 BLUE = (0, 122, 116)
+POINTED = (141, 199, 63)  # курсор наведён на кнопку
+NOT_POINTED = (255, 251, 214)  # курсор не наведён на кнопку
 
 '''Глобальные переменные'''
 score = 0  # очки
@@ -37,14 +39,16 @@ pipes_sound = mixer.Sound(os.path.join('data', 'pipes.wav'))
 end_sound = mixer.Sound(os.path.join('data', 'end.wav'))
 
 
-class Bird(pygame.sprite.Sprite):  # спрайт птицки
+class Bird(pygame.sprite.Sprite):  # спрайт птички
     def __init__(self):
         super().__init__(all_sprites)
         self.gravity = 0.6
-        self.jump_strength = -9  # Высота прыжка
+        self.jump_strength = -9  # Сила прыжка
         self.boost = 0  # Вертикальная скорость
+
         # Cписок изображений, которые используются для анимации птички в игре
         self.bird_shots = [pygame.transform.scale(load_image(f'bird{i}.png'), BIRD_SIZE) for i in range(1, 4)]
+
         self.shot = 0  # Кадр
         self.image = self.bird_shots[self.shot]  # Хранение текущего изображения
         self.rect = self.image.get_rect()  # Прямоугольник для текущего изображения птички
@@ -66,11 +70,11 @@ class Bird(pygame.sprite.Sprite):  # спрайт птицки
     def update(self):
         self.mask = pygame.mask.from_surface(self.image)  # Создание маски
 
-        if is_flying: # Если птицка прыгнула
-            self.boost += self.gravity  # Эфект гравитации
+        if is_flying:  # Если птичка прыгнула
+            self.boost += self.gravity  # Эффект гравитации
             self.rect.y += self.boost  # Обновление вертикальной позиции птички
 
-            if self.rect.y > HEIGHT - 150:  # Проверка на выход птички за приделы экрана
+            if self.rect.y > HEIGHT - 150:  # Проверка на выход птички за пределы экрана
                 self.rect.y = HEIGHT - 150
                 self.boost = 0
 
@@ -81,7 +85,7 @@ class Bird(pygame.sprite.Sprite):  # спрайт птицки
             self.image = self.bird_shots[self.shot]  # Замена кадра
 
         if self.boost < 0:
-            # Вращение изображения птички в зависимости от её вертикальной скорости при взлете
+            # Вращение изображения птички в зависимости от её вертикальной скорости при взлёте
             self.image = pygame.transform.rotate(self.bird_shots[self.shot], min(30, -self.boost * 4))
         elif self.boost > 0:
             # Вращение изображения птички в зависимости от её вертикальной скорости при падении
@@ -189,38 +193,35 @@ def load_image(name, colorkey=None):  # импорт картинок
     return image
 
 
-def start_screen():
+def start_screen():  # начальное окно
     global is_alive
 
-    is_alive = True
+    is_alive = True  # птица жива
 
     screen.fill(BLUE)
 
-    image = pygame.transform.scale(load_image('logo.png'), (360, 90))
+    image = pygame.transform.scale(load_image('logo.png'), (360, 90))  # логотип
     screen.blit(image, (45, 45))
 
-    font = pygame.font.Font(None, 60)
+    font = pygame.font.Font(None, 60)  # шрифт
 
-    ''' Кнопка "Start" '''
-    start_button = pygame.Surface((300, 75))
+    start_button = pygame.Surface((300, 75))  # кнопка "Start"
     start_text = font.render('Start', True, BLACK)
-    start_rect = start_text.get_rect(
+    start_text_rect = start_text.get_rect(
         center=(start_button.get_width() / 2,
                 start_button.get_height() / 2))
     start_button_rect = pygame.Rect(75, 220, 300, 75)
 
-    ''' Кнопка "Records" '''
-    leaders_button = pygame.Surface((300, 75))
-    leaders_text = font.render('Records', True, BLACK)
-    leaders_rect = leaders_text.get_rect(
-        center=(leaders_button.get_width() / 2,
-                leaders_button.get_height() / 2))
-    leaders_button_rect = pygame.Rect(75, 320, 300, 75)
+    records_button = pygame.Surface((300, 75))  # кнопка "Records"
+    records_text = font.render('Records', True, BLACK)
+    records_text_rect = records_text.get_rect(
+        center=(records_button.get_width() / 2,
+                records_button.get_height() / 2))
+    records_button_rect = pygame.Rect(75, 320, 300, 75)
 
-    ''' Кнопка "Settings" '''
-    settings_button = pygame.Surface((300, 75))
+    settings_button = pygame.Surface((300, 75))  # кнопка "Settings"
     settings_text = font.render('Settings', True, BLACK)
-    settings_rect = settings_text.get_rect(
+    settings_text_rect = settings_text.get_rect(
         center=(settings_button.get_width() / 2,
                 settings_button.get_height() / 2))
     settings_button_rect = pygame.Rect(75, 420, 300, 75)
@@ -230,39 +231,92 @@ def start_screen():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if start_button_rect.collidepoint(event.pos):
-                    game_screen()
-                if leaders_button_rect.collidepoint(event.pos):
-                    records_window()
-                if settings_button_rect.collidepoint(event.pos):
-                    settings_window()
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # если прожата...
+                if start_button_rect.collidepoint(event.pos):  # ...кнопка "Start"...
+                    game_screen()  # ...запускается игра
+                if records_button_rect.collidepoint(event.pos):  # ...кнопка "Records"...
+                    records_window()  # ...открывается окно рекордов
+                if settings_button_rect.collidepoint(event.pos):  # ...кнопка "Settings"...
+                    settings_window()  # ...открывается окно настроек
 
         if start_button_rect.collidepoint(pygame.mouse.get_pos()):
-            pygame.draw.rect(start_button, (141, 199, 63), (1, 1, 298, 73))
+            pygame.draw.rect(start_button, POINTED, (1, 1, 298, 73))
         else:
-            pygame.draw.rect(start_button, (255, 251, 214), (1, 1, 298, 73))
-        start_button.blit(start_text, start_rect)
+            pygame.draw.rect(start_button, NOT_POINTED, (1, 1, 298, 73))
+        start_button.blit(start_text, start_text_rect)
         screen.blit(start_button, (start_button_rect.x, start_button_rect.y))
 
-        if leaders_button_rect.collidepoint(pygame.mouse.get_pos()):
-            pygame.draw.rect(leaders_button, (141, 199, 63), (1, 1, 298, 73))
+        if records_button_rect.collidepoint(pygame.mouse.get_pos()):
+            pygame.draw.rect(records_button, POINTED, (1, 1, 298, 73))
         else:
-            pygame.draw.rect(leaders_button, (255, 251, 214), (1, 1, 298, 73))
-        leaders_button.blit(leaders_text, leaders_rect)
-        screen.blit(leaders_button, (leaders_button_rect.x, leaders_button_rect.y))
+            pygame.draw.rect(records_button, NOT_POINTED, (1, 1, 298, 73))
+        records_button.blit(records_text, records_text_rect)
+        screen.blit(records_button, (records_button_rect.x, records_button_rect.y))
 
         if settings_button_rect.collidepoint(pygame.mouse.get_pos()):
-            pygame.draw.rect(settings_button, (141, 199, 63), (1, 1, 298, 73))
+            pygame.draw.rect(settings_button, POINTED, (1, 1, 298, 73))
         else:
-            pygame.draw.rect(settings_button, (255, 251, 214), (1, 1, 298, 73))
-        settings_button.blit(settings_text, settings_rect)
+            pygame.draw.rect(settings_button, NOT_POINTED, (1, 1, 298, 73))
+        settings_button.blit(settings_text, settings_text_rect)
         screen.blit(settings_button, (settings_button_rect.x, settings_button_rect.y))
 
         pygame.display.update()
 
 
-def settings_window():
+def records_window():  # окно рекордов
+    window = pygame.display.set_mode(SIZE)
+    window.fill(BLUE)
+
+    with open('records.csv', encoding="utf8") as csvfile:
+        file = csv.DictReader(csvfile, delimiter=';', quotechar='"')
+        records = sorted(file, key=lambda x: int(x['points']), reverse=True)
+
+    font = pygame.font.Font(None, 40)
+
+    y = 100
+    place = 1
+    for i in records:
+        name = font.render(f'{place}. {i["name"]}:', True, WHITE)
+        screen.blit(name, (50, y))
+        points = font.render(f'{i["points"]}', True, WHITE)
+        screen.blit(points, (350, y))
+
+        y += 40
+        if place < 10:
+            place += 1
+        else:
+            break
+
+    back_button = pygame.Surface((152, 50))
+    back_text = font.render('Back', True, BLACK)
+    back_rect = back_text.get_rect(
+        center=(back_button.get_width() / 2,
+                back_button.get_height() / 2))
+    back_button_rect = pygame.Rect(5, 5, 152, 50)
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if back_button_rect.collidepoint(event.pos):
+                    running = False
+
+        if back_button_rect.collidepoint(pygame.mouse.get_pos()):
+            pygame.draw.rect(back_button, POINTED, (1, 1, 150, 48))
+        else:
+            pygame.draw.rect(back_button, NOT_POINTED, (1, 1, 150, 48))
+        back_button.blit(back_text, back_rect)
+        window.blit(back_button, (back_button_rect.x, back_button_rect.y))
+
+        pygame.display.update()
+
+    start_screen()
+
+
+def settings_window():  # окно настроек
     global flap_sound
 
     running = True
@@ -317,64 +371,11 @@ def settings_window():
         back_button_rect = pygame.Rect(5, 5, 152, 50)
 
         if back_button_rect.collidepoint(pygame.mouse.get_pos()):
-            pygame.draw.rect(back_button, (141, 199, 63), (1, 1, 150, 48))
+            pygame.draw.rect(back_button, POINTED, (1, 1, 150, 48))
         else:
-            pygame.draw.rect(back_button, (255, 251, 214), (1, 1, 150, 48))
+            pygame.draw.rect(back_button, NOT_POINTED, (1, 1, 150, 48))
         back_button.blit(back_text, back_rect)
         screen.blit(back_button, (back_button_rect.x, back_button_rect.y))
-
-        pygame.display.update()
-
-    start_screen()
-
-
-def records_window():  # окно рекордов
-    window = pygame.display.set_mode(SIZE)
-    window.fill(BLUE)
-
-    with open('records.csv', encoding="utf8") as csvfile:
-        file = csv.DictReader(csvfile, delimiter=';', quotechar='"')
-        records = sorted(file, key=lambda x: int(x['points']), reverse=True)
-
-    font = pygame.font.Font(None, 40)
-
-    y = 100
-    place = 1
-    for i in records:
-        name = font.render(f'{place}. {i["name"]}:', True, WHITE)
-        screen.blit(name, (50, y))
-        points = font.render(f'{i["points"]}', True, WHITE)
-        screen.blit(points, (350, y))
-
-        y += 40
-        if place < 10:
-            place += 1
-        else:
-            break
-
-    back_button = pygame.Surface((152, 50))
-    back_text = font.render('Back', True, BLACK)
-    back_rect = back_text.get_rect(
-        center=(back_button.get_width() / 2,
-                back_button.get_height() / 2))
-    back_button_rect = pygame.Rect(5, 5, 152, 50)
-
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if back_button_rect.collidepoint(event.pos):
-                    running = False
-
-        if back_button_rect.collidepoint(pygame.mouse.get_pos()):
-            pygame.draw.rect(back_button, (141, 199, 63), (1, 1, 150, 48))
-        else:
-            pygame.draw.rect(back_button, (255, 251, 214), (1, 1, 150, 48))
-        back_button.blit(back_text, back_rect)
-        window.blit(back_button, (back_button_rect.x, back_button_rect.y))
 
         pygame.display.update()
 
