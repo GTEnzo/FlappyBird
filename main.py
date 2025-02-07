@@ -239,21 +239,21 @@ def start_screen():  # начальное окно
                 if settings_button_rect.collidepoint(event.pos):  # ...кнопка "Settings"...
                     settings_window()  # ...открывается окно настроек
 
-        if start_button_rect.collidepoint(pygame.mouse.get_pos()):
+        if start_button_rect.collidepoint(pygame.mouse.get_pos()):  # наведение курсора
             pygame.draw.rect(start_button, POINTED, (1, 1, 298, 73))
         else:
             pygame.draw.rect(start_button, NOT_POINTED, (1, 1, 298, 73))
         start_button.blit(start_text, start_text_rect)
         screen.blit(start_button, (start_button_rect.x, start_button_rect.y))
 
-        if records_button_rect.collidepoint(pygame.mouse.get_pos()):
+        if records_button_rect.collidepoint(pygame.mouse.get_pos()):  # наведение курсора
             pygame.draw.rect(records_button, POINTED, (1, 1, 298, 73))
         else:
             pygame.draw.rect(records_button, NOT_POINTED, (1, 1, 298, 73))
         records_button.blit(records_text, records_text_rect)
         screen.blit(records_button, (records_button_rect.x, records_button_rect.y))
 
-        if settings_button_rect.collidepoint(pygame.mouse.get_pos()):
+        if settings_button_rect.collidepoint(pygame.mouse.get_pos()):  # наведение курсора
             pygame.draw.rect(settings_button, POINTED, (1, 1, 298, 73))
         else:
             pygame.draw.rect(settings_button, NOT_POINTED, (1, 1, 298, 73))
@@ -267,15 +267,15 @@ def records_window():  # окно рекордов
     window = pygame.display.set_mode(SIZE)
     window.fill(BLUE)
 
-    with open('records.csv', encoding="utf8") as csvfile:
+    with open('records.csv', encoding="utf8") as csvfile:  # открытие таблицы
         file = csv.DictReader(csvfile, delimiter=';', quotechar='"')
-        records = sorted(file, key=lambda x: int(x['points']), reverse=True)
+        records = sorted(file, key=lambda x: int(x['points']), reverse=True)  # создание списка
 
-    font = pygame.font.Font(None, 40)
+    font = pygame.font.Font(None, 40)  # шрифт
 
     y = 100
     place = 1
-    for i in records:
+    for i in records:  # упорядоченное распределение первых 10 рекордов
         name = font.render(f'{place}. {i["name"]}:', True, WHITE)
         screen.blit(name, (50, y))
         points = font.render(f'{i["points"]}', True, WHITE)
@@ -287,9 +287,9 @@ def records_window():  # окно рекордов
         else:
             break
 
-    back_button = pygame.Surface((152, 50))
+    back_button = pygame.Surface((152, 50))  # кнопка "Back"
     back_text = font.render('Back', True, BLACK)
-    back_rect = back_text.get_rect(
+    back_text_rect = back_text.get_rect(
         center=(back_button.get_width() / 2,
                 back_button.get_height() / 2))
     back_button_rect = pygame.Rect(5, 5, 152, 50)
@@ -300,15 +300,15 @@ def records_window():  # окно рекордов
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if back_button_rect.collidepoint(event.pos):
-                    running = False
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # если прожата...
+                if back_button_rect.collidepoint(event.pos):  # ...кнопка "Back"...
+                    running = False  # ...возврат в начальное окно
 
-        if back_button_rect.collidepoint(pygame.mouse.get_pos()):
+        if back_button_rect.collidepoint(pygame.mouse.get_pos()):  # наведение курсора
             pygame.draw.rect(back_button, POINTED, (1, 1, 150, 48))
         else:
             pygame.draw.rect(back_button, NOT_POINTED, (1, 1, 150, 48))
-        back_button.blit(back_text, back_rect)
+        back_button.blit(back_text, back_text_rect)
         window.blit(back_button, (back_button_rect.x, back_button_rect.y))
 
         pygame.display.update()
@@ -319,14 +319,20 @@ def records_window():  # окно рекордов
 def settings_window():  # окно настроек
     global flap_sound
 
-    running = True
     volume1 = flap_sound.get_volume()
     volume2 = pipes_sound.get_volume()
     volume3 = end_sound.get_volume()
 
     font = pygame.font.Font(None, 40)
-    small_font = pygame.font.Font(None, 30)
 
+    back_button = pygame.Surface((152, 50))
+    back_text = font.render('Back', True, BLACK)
+    back_text_rect = back_text.get_rect(
+        center=(back_button.get_width() / 2,
+                back_button.get_height() / 2))
+    back_button_rect = pygame.Rect(5, 5, 152, 50)
+
+    running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -343,7 +349,6 @@ def settings_window():  # окно настроек
                     flap_sound.set_volume(volume1)
                     pipes_sound.set_volume(volume2)
                     end_sound.set_volume(volume3)
-
                 if event.key == pygame.K_RIGHT:
                     volume1 = min(1, volume1 + 0.05)
                     volume2 = min(1, volume2 + 0.05)
@@ -355,26 +360,19 @@ def settings_window():  # окно настроек
         screen.fill(BLUE)
 
         volume_text = font.render(f'Volume: {int(volume1 * 20)}', True, WHITE)
-        screen.blit(volume_text, (50, 200))
+        screen.blit(volume_text, (50, 240))
 
-        instruction_text = small_font.render('Use LEFT/RIGHT', True, WHITE)
-        instruction_text2 = small_font.render('arrows to adjust volume', True, WHITE)
-        screen.blit(instruction_text, (50, 120))
-        screen.blit(instruction_text2, (50, 150))
+        instruction_text1 = font.render('Use LEFT/RIGHT', True, WHITE)
+        instruction_text2 = font.render('arrows to adjust volume', True, WHITE)
 
-        ''' Кнопка "Back" '''
-        back_button = pygame.Surface((152, 50))
-        back_text = font.render('Back', True, BLACK)
-        back_rect = back_text.get_rect(
-            center=(back_button.get_width() / 2,
-                    back_button.get_height() / 2))
-        back_button_rect = pygame.Rect(5, 5, 152, 50)
+        screen.blit(instruction_text1, (50, 120))
+        screen.blit(instruction_text2, (50, 160))
 
         if back_button_rect.collidepoint(pygame.mouse.get_pos()):
             pygame.draw.rect(back_button, POINTED, (1, 1, 150, 48))
         else:
             pygame.draw.rect(back_button, NOT_POINTED, (1, 1, 150, 48))
-        back_button.blit(back_text, back_rect)
+        back_button.blit(back_text, back_text_rect)
         screen.blit(back_button, (back_button_rect.x, back_button_rect.y))
 
         pygame.display.update()
@@ -385,13 +383,14 @@ def settings_window():  # окно настроек
 def game_screen():  # игровое окно
     global score, is_alive, is_flying, random_number
 
-    bird = Bird()
+    bird = Bird()  # вызов класса птички
 
-    pipe1 = TopPipe(700)
-    pipe2 = TopPipe(950)
-    pipe3 = BottomPipe(700)
-    pipe4 = BottomPipe(950)
+    pipe1 = TopPipe(700)  # верхняя труба 1
+    pipe2 = TopPipe(950)  # верхняя труба 2
+    pipe3 = BottomPipe(700)  # нижняя труба 1
+    pipe4 = BottomPipe(950)  # нижняя труба 2
 
+    # Получение рандомных значений
     pipe1.get_random_number(random_number)
     pipe3.get_random_number(random_number + 1000)
 
@@ -403,24 +402,23 @@ def game_screen():  # игровое окно
     pipes = pygame.sprite.Group()
     pipes.add(pipe1, pipe2, pipe3, pipe4)
 
-    ground = Ground()
+    ground = Ground()  # вызов класса земли
 
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                bird.jump()
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                bird.jump()
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_m:
+            if (event.type == pygame.MOUSEBUTTONDOWN) or (
+                    event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE):  # если прожата мышка или пробел
+                bird.jump()  # птичка прыгает
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_m:  # если прожата "M"
                 score = 0
                 is_alive = False
                 is_flying = False
-                start_screen()
+                start_screen()  # выход в меню
 
-        if pipe1.rect.x <= -50:
+        if pipe1.rect.right <= 0:
             pipe1 = TopPipe(450)
             pipe3 = BottomPipe(450)
 
@@ -431,7 +429,7 @@ def game_screen():  # игровое окно
 
             pipes.add(pipe1, pipe3)
 
-        if pipe2.rect.x <= -50:
+        if pipe2.rect.right <= 0:
             pipe2 = TopPipe(450)
             pipe4 = BottomPipe(450)
 
@@ -443,17 +441,17 @@ def game_screen():  # игровое окно
             pipes.add(pipe2, pipe4)
 
         if pygame.sprite.collide_mask(bird, ground) or pygame.sprite.spritecollide(bird, pipes,
-                                                                                   False) or bird.rect.y < -200:
+                                                                                   False) or bird.rect.y < -200:  # если произошло столкновение
 
             with open('records.csv', 'a', newline='', encoding="utf8") as csvfile:
                 writer = csv.writer(
                     csvfile, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
-                writer.writerow([dt.datetime.now().date(), score])
+                writer.writerow([dt.datetime.now().date(), score])  # запись очков в таблицу
 
             score = 0
             end_sound.play()
-            end_screen()
+            end_screen()  # вызов конечного окна
 
         else:
             bird.update()
@@ -461,7 +459,7 @@ def game_screen():  # игровое окно
                 pipes.update()
             ground.update()
 
-        image = pygame.transform.scale(load_image('background.jpg'), SIZE)
+        image = pygame.transform.scale(load_image('background.jpg'), SIZE)  # фон
         screen.blit(image, (0, 0))
 
         bird.draw(screen)
@@ -469,9 +467,9 @@ def game_screen():  # игровое окно
             pipes.draw(screen)
         ground.draw(screen)
 
-        font = pygame.font.Font(None, 40)
+        font = pygame.font.Font(None, 40)  # шрифт
 
-        text = font.render(f'Score: {score}', True, WHITE)
+        text = font.render(f'Score: {score}', True, WHITE)  # текст очков
         screen.blit(text, (20, 20))
 
         pygame.display.update()
@@ -488,18 +486,19 @@ def end_screen():  # конец игры
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_m:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_m:  # если прожата "M"
                 score = 0
                 is_flying = False
-                start_screen()
-            if (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE) or event.type == pygame.MOUSEBUTTONDOWN:
+                start_screen()  # выход в меню
+            if (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE) or (
+                    event.type == pygame.MOUSEBUTTONDOWN):  # если прожата мышка или пробел
                 is_flying = False
-                game_screen()
+                game_screen()  # рестарт
 
-        font = pygame.font.Font(None, 30)
+        font = pygame.font.Font(None, 30)  # шрифт
 
         text1 = font.render(f'Game over!', True, WHITE)
-        text2 = font.render(f'Click SPACE to restart.', True, WHITE)
+        text2 = font.render(f'Click SPACE to restart', True, WHITE)
         text3 = font.render(f'Click M or left button to move in menu', True, WHITE)
 
         screen.blit(text1, (50, 100))
@@ -511,4 +510,4 @@ def end_screen():  # конец игры
         clock.tick(FPS)
 
 
-start_screen()  # вызов начального окна
+start_screen()
