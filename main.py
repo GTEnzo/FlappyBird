@@ -329,54 +329,54 @@ def records_window():  # окно рекордов
 def settings_window():  # окно настроек
     global flap_sound, current_background, current_top_pipe, current_bottom_pipe, current_ground
 
+    # Громкости звуков
     volume1 = flap_sound.get_volume()
     volume2 = pipes_sound.get_volume()
     volume3 = end_sound.get_volume()
 
-    font = pygame.font.Font(None, 40)
-    small_font = pygame.font.Font(None, 30)
+    font = pygame.font.Font(None, 40)  # шрифт
 
-    backgrounds = [
+    backgrounds = [  # изображения фонов
         'background1.jpg',
         'background2.jpg',
         'background3.jpg'
     ]
 
-    top_pipes = [
+    top_pipes = [  # изображения верхней трубы
         'top_pipe1.png',
         'top_pipe2.png',
         'top_pipe3.png'
     ]
 
-    bottom_pipes = [
+    bottom_pipes = [  # изображения нижней трубы
         'bottom_pipe1.png',
         'bottom_pipe2.png',
         'bottom_pipe3.png'
     ]
 
-    grounds = [
+    grounds = [  # изображения земли
         'ground1.png',
         'ground2.png',
         'ground3.png'
     ]
 
-    index = backgrounds.index(current_background)
+    index = backgrounds.index(current_background)  # номер фона
 
-    back_button = pygame.Surface((152, 50))
+    back_button = pygame.Surface((152, 50))  # кнопка "Back"
     back_text = font.render('Back', True, BLACK)
     back_text_rect = back_text.get_rect(
         center=(back_button.get_width() / 2,
                 back_button.get_height() / 2))
     back_button_rect = pygame.Rect(5, 5, 152, 50)
 
-    previous_button = pygame.Surface((50, 50))
+    previous_button = pygame.Surface((50, 50))  # кнопка "<"
     previous_text = font.render('<', True, BLACK)
     previous_text_rect = previous_text.get_rect(
         center=(previous_button.get_width() / 2,
                 previous_button.get_height() / 2))
     previous_button_rect = pygame.Rect(50, 350, 50, 50)
 
-    next_button = pygame.Surface((50, 50))
+    next_button = pygame.Surface((50, 50))  # кнопка ">"
     next_text = font.render('>', True, BLACK)
     next_text_rect = next_text.get_rect(
         center=(next_button.get_width() / 2,
@@ -390,38 +390,42 @@ def settings_window():  # окно настроек
                 pygame.quit()
                 sys.exit()
 
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if back_button_rect.collidepoint(event.pos):
-                    running = False
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # если прожата...
+                if back_button_rect.collidepoint(event.pos):  # ...кнопка "Back"...
+                    running = False  # ...возврат в начальное окно
 
-                if next_button_rect.collidepoint(event.pos):
+                if next_button_rect.collidepoint(event.pos):  # ...кнопка "<"...
+                    # ...все изображения меняются на соответсвующие фону
                     index = (index + 1) % len(backgrounds)
                     current_background = backgrounds[index]
                     current_top_pipe = top_pipes[index]
                     current_bottom_pipe = bottom_pipes[index]
                     current_ground = grounds[index]
 
-                if previous_button_rect.collidepoint(event.pos):
+                if previous_button_rect.collidepoint(event.pos):  # ...кнопка ">"...
+                    # ...все изображения меняются на соответсвующие фону
                     index = (index - 1) % len(backgrounds)
                     current_background = backgrounds[index]
                     current_top_pipe = top_pipes[index]
                     current_bottom_pipe = bottom_pipes[index]
                     current_ground = grounds[index]
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    volume1 = max(0, volume1 - 0.05)
-                    volume2 = max(0, volume2 - 0.05)
-                    volume3 = max(0, volume3 - 0.05)
+            if event.type == pygame.KEYDOWN:  # если прожата...
+                if event.key == pygame.K_LEFT:  # ...левая стрелка...
+                    # ...громкость меньше
+                    volume1 = max(0, volume1 - 0.1)
+                    volume2 = max(0, volume2 - 0.1)
+                    volume3 = max(0, volume3 - 0.1)
 
                     flap_sound.set_volume(volume1)
                     pipes_sound.set_volume(volume2)
                     end_sound.set_volume(volume3)
 
-                if event.key == pygame.K_RIGHT:
-                    volume1 = min(1, volume1 + 0.05)
-                    volume2 = min(1, volume2 + 0.05)
-                    volume3 = min(1, volume3 + 0.05)
+                if event.key == pygame.K_RIGHT:  # ...правая стрелка...
+                    # ...громкость больше
+                    volume1 = min(1, volume1 + 0.1)
+                    volume2 = min(1, volume2 + 0.1)
+                    volume3 = min(1, volume3 + 0.1)
 
                     flap_sound.set_volume(volume1)
                     pipes_sound.set_volume(volume2)
@@ -429,38 +433,38 @@ def settings_window():  # окно настроек
 
         screen.fill(BLUE)
 
-        image = pygame.transform.scale(load_image(backgrounds[index]), (200, 200))
-        screen.blit(image, (125, 300))
-
-        if back_button_rect.collidepoint(pygame.mouse.get_pos()):
+        if back_button_rect.collidepoint(pygame.mouse.get_pos()):  # наведение курсора
             pygame.draw.rect(back_button, POINTED, (1, 1, 150, 48))
         else:
             pygame.draw.rect(back_button, NOT_POINTED, (1, 1, 150, 48))
         back_button.blit(back_text, back_text_rect)
         screen.blit(back_button, (back_button_rect.x, back_button_rect.y))
 
-        if previous_button_rect.collidepoint(pygame.mouse.get_pos()):
+        if previous_button_rect.collidepoint(pygame.mouse.get_pos()):  # наведение курсора
             pygame.draw.rect(previous_button, POINTED, (1, 1, 48, 48))
         else:
             pygame.draw.rect(previous_button, NOT_POINTED, (1, 1, 48, 48))
         previous_button.blit(previous_text, previous_text_rect)
         screen.blit(previous_button, (previous_button_rect.x, previous_button_rect.y))
 
-        if next_button_rect.collidepoint(pygame.mouse.get_pos()):
+        if next_button_rect.collidepoint(pygame.mouse.get_pos()):  # наведение курсора
             pygame.draw.rect(next_button, POINTED, (1, 1, 48, 48))
         else:
             pygame.draw.rect(next_button, NOT_POINTED, (1, 1, 48, 48))
         next_button.blit(next_text, next_text_rect)
         screen.blit(next_button, (next_button_rect.x, next_button_rect.y))
 
-        volume_text = font.render(f'Volume: {int(volume1 * 20)}', True, WHITE)
-        screen.blit(volume_text, (50, 200))
+        image = pygame.transform.scale(load_image(backgrounds[index]), (200, 200))  # картинка текущего фона
+        screen.blit(image, (125, 300))
 
-        instruction_text = small_font.render('Use LEFT/RIGHT', True, WHITE)
-        instruction_text2 = small_font.render('arrows to adjust volume', True, WHITE)
+        volume_text = font.render(f'Volume: {int(volume1 * 10)}', True, WHITE)  # текст громкости
+        screen.blit(volume_text, (50, 210))
 
-        screen.blit(instruction_text, (50, 120))
-        screen.blit(instruction_text2, (50, 150))
+        instruction_text = font.render('Use LEFT/RIGHT', True, WHITE)
+        instruction_text2 = font.render('arrows to adjust volume', True, WHITE)
+
+        screen.blit(instruction_text, (50, 100))
+        screen.blit(instruction_text2, (50, 135))
 
         pygame.display.update()
 
@@ -612,12 +616,14 @@ def end_screen():  # конец игры
         font = pygame.font.Font(None, 30)
 
         text1 = font.render(f'Game over!', True, WHITE)
-        text2 = font.render(f'Click SPACE to restart.', True, WHITE)
-        text3 = font.render(f'Click M or left button to move in menu', True, WHITE)
+        text2 = font.render(f'You scored {score} points', True, WHITE)
+        text3 = font.render(f'Click SPACE to restart', True, WHITE)
+        text4 = font.render(f'Click M or left button to move in menu', True, WHITE)
 
         screen.blit(text1, (50, 100))
-        screen.blit(text2, (50, 200))
+        screen.blit(text2, (50, 150))
         screen.blit(text3, (50, 250))
+        screen.blit(text4, (50, 300))
 
         pygame.display.update()
 
