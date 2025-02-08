@@ -474,42 +474,41 @@ def settings_window():  # окно настроек
 def game_screen():  # игровое окно
     global score, is_alive, is_flying, random_number, current_background
 
-    bird = Bird()
+    bird = Bird()  # вызов спрайта птички
 
-    pipe1 = TopPipe(700)
-    pipe2 = TopPipe(950)
-    pipe3 = BottomPipe(700)
-    pipe4 = BottomPipe(950)
+    pipe1 = TopPipe(700)  # первая верхняя труба
+    pipe2 = TopPipe(950)  # первая нижняя труба
+    pipe3 = BottomPipe(700)  # вторая верхняя труба
+    pipe4 = BottomPipe(950)  # вторая нижняя труба
 
-    pipe1.get_random_number(random_number)
-    pipe3.get_random_number(random_number + 1000)
+    pipe1.get_random_number(random_number)  # присваевание "y"-а первой верхней трубе
+    pipe3.get_random_number(random_number + 1000)  # присваевание "y"-а первой нижней трубе
 
-    random_number = random.randint(-750, -550)
+    random_number = random.randint(-750, -550)  # получение нового значения
 
-    pipe2.get_random_number(random_number)
-    pipe4.get_random_number(random_number + 1000)
+    pipe2.get_random_number(random_number)  # присваевание "y"-а второй верхней трубе
+    pipe4.get_random_number(random_number + 1000)  # присваевание "y"-а второй нижней трубе
 
-    pipes = pygame.sprite.Group()
-    pipes.add(pipe1, pipe2, pipe3, pipe4)
+    pipes = pygame.sprite.Group()  # группа спрайтов труб
+    pipes.add(pipe1, pipe2, pipe3, pipe4)  # добавление спрайтов в группу
 
-    ground = Ground(0)
+    ground = Ground(0)  # вызов спрайта земли
 
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                bird.jump()
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                bird.jump()
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_m:
+            if (event.type == pygame.MOUSEBUTTONDOWN) or (
+                    event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE):  # если прожат пробел или левая кнопка мышки...
+                bird.jump()  # ...птичка прыгает
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_m:  # если прожата "M"...
                 score = 0
                 is_alive = False
                 is_flying = False
-                start_screen()
+                start_screen()  # ...выход в меню
 
-        if pipe1.rect.x <= -50:
+        if pipe1.rect.right <= 0:
             pipe1 = TopPipe(450)
             pipe3 = BottomPipe(450)
 
@@ -533,7 +532,7 @@ def game_screen():  # игровое окно
 
             pipes.add(pipe1, pipe3)
 
-        if pipe2.rect.x <= -50:
+        if pipe2.rect.right <= 0:
             pipe2 = TopPipe(450)
             pipe4 = BottomPipe(450)
 
@@ -560,17 +559,17 @@ def game_screen():  # игровое окно
         if ground.rect.x < -WIDTH:
             ground = Ground(0)
 
-        if (pygame.sprite.collide_mask(bird, ground) or pygame.sprite.spritecollide(bird, pipes, False) or not (
-                -200 < bird.rect.y < 485)):
+        if pygame.sprite.collide_mask(bird, ground) or pygame.sprite.spritecollide(bird, pipes,
+                                                                                   False) or bird.rect.y < -200:  # если произошло столкновение
+
             with open('records.csv', 'a', newline='', encoding="utf8") as csvfile:
                 writer = csv.writer(
                     csvfile, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
-                writer.writerow([dt.datetime.now().date(), score])
+                writer.writerow([dt.datetime.now().date(), score])  # запись очков в таблицу
 
-            score = 0
             end_sound.play()
-            end_screen()
+            end_screen(score)  # вызов конечного окна
 
         else:
             bird.update()
@@ -578,7 +577,7 @@ def game_screen():  # игровое окно
                 pipes.update()
             ground.update()
 
-        image = pygame.transform.scale(load_image(current_background), SIZE)
+        image = pygame.transform.scale(load_image(current_background), SIZE)  # фон
         screen.blit(image, (0, 0))
 
         bird.draw(screen)
@@ -586,9 +585,9 @@ def game_screen():  # игровое окно
             pipes.draw(screen)
         ground.draw(screen)
 
-        font = pygame.font.Font(None, 40)
+        font = pygame.font.Font(None, 40)  # шрифт
 
-        text = font.render(f'Score: {score}', True, WHITE)
+        text = font.render(f'Score: {score}', True, WHITE)  # текст очков
         screen.blit(text, (20, 20))
 
         pygame.display.update()
@@ -596,7 +595,7 @@ def game_screen():  # игровое окно
         clock.tick(FPS)
 
 
-def end_screen():  # конец игры
+def end_screen(s):  # конец игры
     global score, is_alive, is_flying
 
     running = True
@@ -605,25 +604,27 @@ def end_screen():  # конец игры
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_m:
-                score = 0
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_m:  # если прожата "M"
                 is_flying = False
-                start_screen()
-            if (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE) or event.type == pygame.MOUSEBUTTONDOWN:
+                start_screen()  # выход в меню
+            if (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE) or (
+                    event.type == pygame.MOUSEBUTTONDOWN):  # если прожата мышка или пробел
                 is_flying = False
-                game_screen()
+                game_screen()  # рестарт
 
-        font = pygame.font.Font(None, 30)
+        font = pygame.font.Font(None, 30)  # шрифт
 
-        text1 = font.render(f'Game over!', True, WHITE)
-        text2 = font.render(f'You scored {score} points', True, WHITE)
-        text3 = font.render(f'Click SPACE to restart', True, WHITE)
-        text4 = font.render(f'Click M or left button to move in menu', True, WHITE)
+        text1 = font.render(f'Game over!', True, WHITE, BLACK)
+        text2 = font.render(f'You scored {s} points', True, WHITE, BLACK)
+        text3 = font.render(f'Click SPACE to restart', True, WHITE, BLACK)
+        text4 = font.render(f'Click M or left button to move in menu', True, WHITE, BLACK)
 
         screen.blit(text1, (50, 100))
         screen.blit(text2, (50, 150))
         screen.blit(text3, (50, 250))
         screen.blit(text4, (50, 300))
+
+        score = 0
 
         pygame.display.update()
 
