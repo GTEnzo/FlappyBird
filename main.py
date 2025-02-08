@@ -500,13 +500,13 @@ def game_screen():  # игровое окно
                 pygame.quit()
                 sys.exit()
             if (event.type == pygame.MOUSEBUTTONDOWN) or (
-                    event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE):  # если прожат пробел или левая кнопка мышки...
-                bird.jump()  # ...птичка прыгает
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_m:  # если прожата "M"...
+                    event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE):  # если прожата мышка или пробел
+                bird.jump()  # птичка прыгает
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_m:  # если прожата "M"
                 score = 0
                 is_alive = False
                 is_flying = False
-                start_screen()  # ...выход в меню
+                start_screen()  # выход в меню
 
         if pipe1.rect.right <= 0:
             pipe1 = TopPipe(450)
@@ -614,10 +614,10 @@ def end_screen(s):  # конец игры
 
         font = pygame.font.Font(None, 30)  # шрифт
 
-        text1 = font.render(f'Game over!', True, WHITE, BLACK)
-        text2 = font.render(f'You scored {s} points', True, WHITE, BLACK)
-        text3 = font.render(f'Click SPACE to restart', True, WHITE, BLACK)
-        text4 = font.render(f'Click M or left button to move in menu', True, WHITE, BLACK)
+        text1 = font.render(f'Game over!', True, WHITE)
+        text2 = font.render(f'You scored {s} points', True, WHITE)
+        text3 = font.render(f'Click SPACE to restart', True, WHITE)
+        text4 = font.render(f'Click M or left button to move in menu', True, WHITE)
 
         screen.blit(text1, (50, 100))
         screen.blit(text2, (50, 150))
