@@ -633,4 +633,4 @@ def end_screen(s):  # конец игры
         clock.tick(FPS)
 
 
-start_screen()
+start_screen()  # запуск меню
