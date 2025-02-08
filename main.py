@@ -45,21 +45,21 @@ pipes_sound = mixer.Sound(os.path.join('data', 'pipes.wav'))
 end_sound = mixer.Sound(os.path.join('data', 'end.wav'))
 
 
-class Bird(pygame.sprite.Sprite):  # Спрайт птички
+class Bird(pygame.sprite.Sprite):  # cпрайт птички
     def __init__(self):
         super().__init__(all_sprites)
-        self.gravity = 0.6  # Гравитация
-        self.jump_strength = -9  # Сила прыжка
-        self.boost = 0  # Вертикальная скорость
+        self.gravity = 0.6  # гравитация
+        self.jump_strength = -9  # сила прыжка
+        self.boost = 0  # вертикальная скорость
 
-        # Cписок изображений, которые используются для анимации птички в игре
+        # список изображений, которые используются для анимации птички в игре
         self.bird_shots = [pygame.transform.scale(load_image(f'bird{i}.png'), BIRD_SIZE) for i in range(1, 4)]
 
-        self.shot = 0  # Номер кадра
+        self.shot = 0  # номер кадра
         self.image = self.bird_shots[self.shot]
         self.rect = self.image.get_rect()
 
-        # Изначальное положение птички
+        # изначальное положение птички
         self.rect.x = 150
         self.rect.y = 280
 
@@ -67,38 +67,38 @@ class Bird(pygame.sprite.Sprite):  # Спрайт птички
         self.shots = 5
         self.num = 0
 
-    def jump(self):  # Прыжок птички
+    def jump(self):  # прыжок птички
         global is_flying
 
-        if not is_flying:  # Если игра не была начата...
-            is_flying = True  # ...Она начата
+        if not is_flying:  # если игра не была начата...
+            is_flying = True  # ...она начата
 
         flap_sound.play()
-        self.boost = self.jump_strength  # Птичка прыгнула
+        self.boost = self.jump_strength  # птичка прыгнула
 
-    def update(self):  # Обновление координат
+    def update(self):  # обновление координат
         self.mask = pygame.mask.from_surface(self.image)
 
-        if is_flying:  # Если птичка прыгнула
-            self.boost += self.gravity  # Эффект гравитации
-            self.rect.y += self.boost  # Обновление вертикальной позиции птички
+        if is_flying:  # если птичка прыгнула
+            self.boost += self.gravity  # эффект гравитации
+            self.rect.y += self.boost  # обновление вертикальной позиции птички
 
         self.num += 1
         if self.num >= self.shots:
             self.num = 0
-            self.shot = (self.shot + 1) % len(self.bird_shots)  # Текущий кадр
-            self.image = self.bird_shots[self.shot]  # Замена кадра
+            self.shot = (self.shot + 1) % len(self.bird_shots)  # текущий кадр
+            self.image = self.bird_shots[self.shot]  # замена кадра
 
         if self.boost < 0:
-            # Вращение изображения птички в зависимости от её вертикальной скорости при взлёте
+            # вращение изображения птички в зависимости от её вертикальной скорости при взлёте
             self.image = pygame.transform.rotate(self.bird_shots[self.shot], min(30, -self.boost * 4))
         elif self.boost > 0:
-            # Вращение изображения птички в зависимости от её вертикальной скорости при падении
+            # вращение изображения птички в зависимости от её вертикальной скорости при падении
             self.image = pygame.transform.rotate(self.bird_shots[self.shot], max(-70, self.boost * -8))
         else:
             self.image = self.bird_shots[self.shot]
 
-    def draw(self, screen):  # Рисование птички
+    def draw(self, screen):  # рисование птички
         screen.blit(self.image, self.rect)
 
 
@@ -514,6 +514,7 @@ def game_screen():  # игровое окно
 
             random_number = random.randint(-750, -550)
 
+            # усложнение в зависимости от пройденного расстояния
             if score > 38:
                 pipe1.get_random_number(random_number)
                 pipe3.get_random_number(random_number + 940)
@@ -538,6 +539,7 @@ def game_screen():  # игровое окно
 
             random_number = random.randint(-750, -550)
 
+            # усложнение в зависимости от пройденного расстояния
             if score > 38:
                 pipe2.get_random_number(random_number)
                 pipe4.get_random_number(random_number + 940)
