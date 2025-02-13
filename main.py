@@ -1,4 +1,3 @@
-from pygame import mixer
 import datetime as dt
 import pygame
 import random
@@ -6,43 +5,37 @@ import sys
 import csv
 import os
 
-'''Константы'''
 FPS = 60  # кадры в секунду
 SIZE = (WIDTH, HEIGHT) = (450, 600)  # размер окна
 BIRD_SIZE = (45, 35)  # размер птички
 
-'''Используемые цвета'''
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 BLUE = (0, 122, 116)
 POINTED = (141, 199, 63)  # курсор наведён
 NOT_POINTED = (255, 251, 214)  # курсор не наведён
 
-'''Глобальные переменные'''
 score = 0  # очки
 scrolling = 2  # скорость труб и земли
 is_alive = True  # жива ли птичка
 is_flying = False  # начата ли игра
 random_number = random.randint(-750, -550)  # используется для рандомной генерации "y" труб
 
-'''Текущие картинки...'''
 current_background = 'background1.jpg'  # ...фона
 current_top_pipe = 'top_pipe1.png'  # ...верхней трубы
 current_bottom_pipe = 'bottom_pipe1.png'  # ...нижней трубы
 current_ground = 'ground1.png'  # ...земли
 
-'''Вызов pygame'''
 pygame.init()
-mixer.init()
+pygame.mixer.init()
 screen = pygame.display.set_mode(SIZE)
 pygame.display.set_caption('Flappy Bird')
 clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
 
-'''Звуки'''
-flap_sound = mixer.Sound(os.path.join('data', 'flap.wav'))
-pipes_sound = mixer.Sound(os.path.join('data', 'pipes.wav'))
-end_sound = mixer.Sound(os.path.join('data', 'end.wav'))
+flap_sound = pygame.mixer.Sound(os.path.join('data', 'flap.wav'))
+pipes_sound = pygame.mixer.Sound(os.path.join('data', 'pipes.wav'))
+end_sound = pygame.mixer.Sound(os.path.join('data', 'end.wav'))
 
 
 class Bird(pygame.sprite.Sprite):  # cпрайт птички
