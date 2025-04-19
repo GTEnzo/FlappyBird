@@ -266,7 +266,7 @@ def records_window():  # окно рекордов
     window = pygame.display.set_mode(SIZE)
     window.fill(BLUE)
 
-    with open('records.csv', encoding="utf8") as csvfile:  # открытие таблицы
+    with open('data/records.csv', encoding="utf8") as csvfile:  # открытие таблицы
         file = csv.DictReader(csvfile, delimiter=';', quotechar='"')
         records = sorted(file, key=lambda x: int(x['points']), reverse=True)
 
@@ -546,7 +546,7 @@ def game_screen():
         if pygame.sprite.collide_mask(bird, ground) or pygame.sprite.spritecollide(bird, pipes,
                                                                                    False) or bird.rect.y < -200:
 
-            with open('records.csv', 'a', newline='', encoding="utf8") as csvfile:
+            with open('data/records.csv', 'a', newline='', encoding="utf8") as csvfile:
                 writer = csv.writer(
                     csvfile, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
